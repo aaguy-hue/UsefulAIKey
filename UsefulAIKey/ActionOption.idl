@@ -1,3 +1,16 @@
 namespace UsefulAIKey
 {
+    enum ActionKind { LaunchApp, LaunchWebsite, OpenFile };
+
+    [default_interface]
+    runtimeclass ActionOption
+    {
+        ActionOption(ActionKind kind, String label);
+
+        // Stable identifier used by the app logic. Never change these values.
+        ActionKind Kind{ get; };
+
+        // Human-readable text shown in the ComboBox. Safe to reword any time.
+        String Label { get; set; };
+    };
 }

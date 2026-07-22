@@ -16,6 +16,11 @@ namespace winrt::UsefulAIKey::implementation
         void MyProperty(int32_t value);
         void Action_SelectionChanged(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::Controls::SelectionChangedEventArgs const& e);
         void InitializeComponent();
+
+    private:
+        // Kept alive as a member so the ComboBox's ItemsSource stays valid for the
+        // lifetime of the window.
+        winrt::Windows::Foundation::Collections::IObservableVector<winrt::UsefulAIKey::ActionOption> m_options{ nullptr };
     };
 }
 

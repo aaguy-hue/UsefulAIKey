@@ -1,15 +1,11 @@
 #include "pch.h"
 #include "MainWindow.xaml.h"
+#include "ActionOption.h"
 #if __has_include("MainWindow.g.cpp")
 #include "MainWindow.g.cpp"
 #endif
 
-#include <winrt/Windows.Foundation.Collections.h>
-#include <winrt/UsefulAIKey.h>
-#include <iostream>
-
 using namespace winrt;
-using namespace UsefulAIKey;
 using namespace Microsoft::UI::Xaml;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -31,39 +27,40 @@ namespace winrt::UsefulAIKey::implementation
     {
         MainWindowT::InitializeComponent();
 
-        auto m_options = winrt::single_threaded_observable_vector<UsefulAIKey::ActionOption>();
+        m_options = single_threaded_observable_vector<UsefulAIKey::ActionOption>();
 
-        m_options.Append(winrt::make<UsefulAIKey::ActionOption>(L"app", L"Launch an app" ));
-        m_options.Append(winrt::make<UsefulAIKey::ActionOption>(L"website", L"Launch a website"));
-        m_options.Append(winrt::make<UsefulAIKey::ActionOption>(L"file", L"Open a file" ));
+        // The first argument is the stable identity -- app logic switches on it.
+        // The second is display text, free to reword or localize.
+        using UsefulAIKey::ActionKind;
+        m_options.Append(make<ActionOption>(ActionKind::LaunchApp, L"Launch an app"));
+        m_options.Append(make<ActionOption>(ActionKind::LaunchWebsite, L"Launch a website"));
+        m_options.Append(make<ActionOption>(ActionKind::OpenFile, L"Open a file"));
 
         ActionComboBox().ItemsSource(m_options);
+        ActionComboBox().SelectedIndex(0);
+    }
 
-	}
-}
+    void MainWindow::Action_SelectionChanged(
+        Windows::Foundation::IInspectable const& sender,
+        Controls::SelectionChangedEventArgs const& /* e */)
+    {
+        auto comboBox = sender.try_as<Controls::ComboBox>();
+        if (!comboBox) return;
 
-void OutputDebugCharPtr(const char* str) {
-    wchar_t wStr[128];
-    size_t converted = 0;
-    mbstowcs_s(&converted, wStr, str, _TRUNCATE);
-    OutputDebugString(wStr);
-}
+        auto option = comboBox.SelectedItem().try_as<UsefulAIKey::ActionOption>();
+        if (!option) return;
 
-
-void winrt::UsefulAIKey::implementation::MainWindow::Action_SelectionChanged(
-    winrt::Windows::Foundation::IInspectable const& sender, 
-    winrt::Microsoft::UI::Xaml::Controls::SelectionChangedEventArgs const& e
-)
-{
-    OutputDebugString(L"Hello\n");
-
-    auto comboBox = sender.as<winrt::Microsoft::UI::Xaml::Controls::ComboBox>();
-    if (!comboBox) return;
-
-    winrt::Windows::Foundation::IInspectable selectedItem = comboBox.SelectedItem();
-    if (!selectedItem) return;
-
-    winrt::hstring text = winrt::unbox_value<winrt::hstring>(selectedItem);
-    OutputDebugString(text.c_str());
-    OutputDebugString(L"\n");
+        switch (option.Kind())
+        {
+        case UsefulAIKey::ActionKind::LaunchApp:
+            OutputDebugStringW(L"Selected: LaunchApp\n");
+            break;
+        case UsefulAIKey::ActionKind::LaunchWebsite:
+            OutputDebugStringW(L"Selected: LaunchWebsite\n");
+            break;
+        case UsefulAIKey::ActionKind::OpenFile:
+            OutputDebugStringW(L"Selected: OpenFile\n");
+            break;
+        }
+    }
 }

@@ -1,19 +1,18 @@
 #include "pch.h"
 #include "ActionOption.h"
+#if __has_include("ActionOption.g.cpp")
 #include "ActionOption.g.cpp"
+#endif
 
 namespace winrt::UsefulAIKey::implementation
 {
-    // Implement the constructor defined in the .idl
-    winrt::UsefulAIKey::ActionOption(winrt::hstring const& id, winrt::hstring const& label)
-        : m_id(id), m_label(label)
+    ActionOption::ActionOption(UsefulAIKey::ActionKind kind, hstring const& label)
+        : m_kind(kind), m_label(label)
     {
     }
 
-    // Property getters/setters (if not already implemented)
-    winrt::hstring ActionOption::Id() { return m_id; }
-    void ActionOption::Id(winrt::hstring const& value) { m_id = value; }
+    UsefulAIKey::ActionKind ActionOption::Kind() { return m_kind; }
 
-    winrt::hstring ActionOption::Label() { return m_label; }
-    void ActionOption::Label(winrt::hstring const& value) { m_label = value; }
+    hstring ActionOption::Label() { return m_label; }
+    void ActionOption::Label(hstring const& value) { m_label = value; }
 }

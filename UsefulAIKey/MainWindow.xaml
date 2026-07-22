@@ -11,14 +11,14 @@
 
     <StackPanel Orientation="Vertical" HorizontalAlignment="Left">
         <!--<TextBlock Text="Your Copilot key will..." Margin="10"/>-->
-        <ComboBox x:Name="ActionComboBox" 
-                  SelectionChanged="Action_SelectionChanged" 
-                  Header="Your Copilot key will..." Width="200"
-                  SelectedValuePath="Id"
-                  DisplayMemberPath="Label">
-            <x:String>Launch an app</x:String>
-            <x:String>Launch a website</x:String>
-            <x:String>Open a file</x:String>
+        <ComboBox x:Name="ActionComboBox"
+                  SelectionChanged="Action_SelectionChanged"
+                  Header="Your Copilot key will..." Width="200">
+            <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="local:ActionOption">
+                    <TextBlock Text="{x:Bind Label}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
         </ComboBox>
     </StackPanel>
 </Window>

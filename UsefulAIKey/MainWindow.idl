@@ -6,12 +6,4 @@ namespace UsefulAIKey
         MainWindow();
         Int32 MyProperty;
     }
-
-    [default_interface]
-    runtimeclass ActionOption
-    {
-        ActionOption(String Id, String Label);
-        String Id { get; set; };
-        String Label { get; set; };
-    };
 }
