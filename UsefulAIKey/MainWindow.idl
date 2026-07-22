@@ -1,0 +1,17 @@
+namespace UsefulAIKey
+{
+    [default_interface]
+    runtimeclass MainWindow : Microsoft.UI.Xaml.Window
+    {
+        MainWindow();
+        Int32 MyProperty;
+    }
+
+    [default_interface]
+    runtimeclass ActionOption
+    {
+        ActionOption(String Id, String Label);
+        String Id { get; set; };
+        String Label { get; set; };
+    };
+}
