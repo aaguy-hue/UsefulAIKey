@@ -20,5 +20,7 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
+
+        <Line></Line>
     </StackPanel>
 </Window>
