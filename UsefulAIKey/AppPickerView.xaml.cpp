@@ -29,15 +29,6 @@ namespace
 
 namespace winrt::UsefulAIKey::implementation
 {
-    int32_t AppPickerView::MyProperty()
-    {
-        throw hresult_not_implemented();
-    }
-
-    void AppPickerView::MyProperty(int32_t /* value */)
-    {
-        throw hresult_not_implemented();
-    }
 
     void AppPickerView::InitializeComponent()
     {

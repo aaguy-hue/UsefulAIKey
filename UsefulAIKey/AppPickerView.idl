@@ -4,6 +4,5 @@ namespace UsefulAIKey
     runtimeclass AppPickerView : Microsoft.UI.Xaml.Controls.UserControl
     {
         AppPickerView();
-        Int32 MyProperty;
     }
 }

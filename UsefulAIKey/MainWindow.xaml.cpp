@@ -17,15 +17,6 @@ using namespace Microsoft::UI::Xaml;
 
 namespace winrt::UsefulAIKey::implementation
 {
-    int32_t MainWindow::MyProperty()
-    {
-        throw hresult_not_implemented();
-    }
-
-    void MainWindow::MyProperty(int32_t /* value */)
-    {
-        throw hresult_not_implemented();
-    }
 
     void MainWindow::InitializeComponent()
     {
