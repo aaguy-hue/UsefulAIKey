@@ -38,9 +38,11 @@
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="local:AppItem">
                     <Grid MinHeight="40">
-                        <!-- Selected-state highlight: a subtle rounded fill behind
-                             the row, shown only for the chosen app. -->
-                        <Border Background="{ThemeResource SubtleFillColorSecondaryBrush}"
+                        <!-- Selected-state highlight: a soft accent-tinted fill behind
+                             the row (the accent brush at low opacity), shown only for
+                             the chosen app. -->
+                        <Border Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                Opacity="0.15"
                                 CornerRadius="6"
                                 Visibility="{x:Bind SelectionIndicatorVisibility, Mode=OneWay}"/>
 
@@ -62,6 +64,7 @@
 
                             <TextBlock Grid.Column="1"
                                        Text="{x:Bind Name}"
+                                       FontWeight="{x:Bind NameFontWeight, Mode=OneWay}"
                                        VerticalAlignment="Center"
                                        TextTrimming="CharacterEllipsis"/>
                         </Grid>

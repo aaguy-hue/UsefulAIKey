@@ -31,5 +31,9 @@ namespace UsefulAIKey
         // so we expose the selection highlight's Visibility directly off the model.
         // Derived from IsSelected; kept in sync via PropertyChanged.
         Microsoft.UI.Xaml.Visibility SelectionIndicatorVisibility{ get; };
+
+        // The name is drawn heavier when this app is selected. Same idea as above:
+        // XAML can't derive a FontWeight from a bool, so we expose it directly.
+        Windows.UI.Text.FontWeight NameFontWeight{ get; };
     }
 }

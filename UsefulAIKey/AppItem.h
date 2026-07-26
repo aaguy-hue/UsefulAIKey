@@ -17,6 +17,7 @@ namespace winrt::UsefulAIKey::implementation
         void IsSelected(bool value);
 
         Microsoft::UI::Xaml::Visibility SelectionIndicatorVisibility();
+        Windows::UI::Text::FontWeight NameFontWeight();
 
         // INotifyPropertyChanged. cppwinrt lets us back the projected event with a
         // winrt::event; XAML subscribes through these and we fire it in RaisePropertyChanged.

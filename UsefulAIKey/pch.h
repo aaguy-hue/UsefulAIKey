@@ -26,4 +26,5 @@
 #include <winrt/Windows.Graphics.Imaging.h>
 #include <winrt/Windows.Storage.Streams.h>
 #include <winrt/Windows.Security.Cryptography.h>
+#include <winrt/Windows.UI.Text.h>
 #include <wil/cppwinrt_helpers.h>

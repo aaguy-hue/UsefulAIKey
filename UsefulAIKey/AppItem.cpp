@@ -32,15 +32,22 @@ namespace winrt::UsefulAIKey::implementation
     {
         if (m_isSelected == value) return;
         m_isSelected = value;
-        // Two properties change together: the flag itself and the derived
-        // Visibility the XAML selection highlight binds to.
+        // Several derived properties change together with the flag: the highlight's
+        // visibility and the name's font weight both key off IsSelected.
         RaisePropertyChanged(L"IsSelected");
         RaisePropertyChanged(L"SelectionIndicatorVisibility");
+        RaisePropertyChanged(L"NameFontWeight");
     }
 
     Visibility AppItem::SelectionIndicatorVisibility()
     {
         return m_isSelected ? Visibility::Visible : Visibility::Collapsed;
+    }
+
+    Windows::UI::Text::FontWeight AppItem::NameFontWeight()
+    {
+        // 600 == SemiBold, 400 == Normal (the FontWeight struct is just a numeric weight).
+        return Windows::UI::Text::FontWeight{ static_cast<uint16_t>(m_isSelected ? 600 : 400) };
     }
 
     event_token AppItem::PropertyChanged(Data::PropertyChangedEventHandler const& handler)
