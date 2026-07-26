@@ -1,0 +1,57 @@
+#pragma once
+
+#include "WindowsApps.h"
+#include "AppPickerView.g.h"
+
+namespace winrt::UsefulAIKey::implementation
+{
+    struct AppPickerView : AppPickerViewT<AppPickerView>
+    {
+        AppPickerView()
+        {
+            // Xaml objects should not call InitializeComponent during construction.
+            // See https://github.com/microsoft/cppwinrt/tree/master/nuget#initializecomponent
+        }
+
+        int32_t MyProperty();
+        void MyProperty(int32_t value);
+        void InitializeComponent();
+
+        // Event handlers
+        void SearchBox_TextChanged(winrt::Microsoft::UI::Xaml::Controls::AutoSuggestBox const& sender, winrt::Microsoft::UI::Xaml::Controls::AutoSuggestBoxTextChangedEventArgs const& args);
+        void AppsList_ItemClick(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::Controls::ItemClickEventArgs const& e);
+        void BrowseForApp_Click(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::RoutedEventArgs const& e);
+
+    private:
+        // Every app we found, sorted by name (the master list).
+        std::vector<winrt::UsefulAIKey::AppItem> m_allApps;
+
+        // The subset currently shown in the ListView: filtered by the search box
+        // and ordered pinned-first. This is what AppsList.ItemsSource points at.
+        winrt::Windows::Foundation::Collections::IObservableVector<winrt::UsefulAIKey::AppItem> m_visibleApps{ nullptr };
+
+        // The app the user has chosen (pinned to the top). Null until they click one.
+        winrt::UsefulAIKey::AppItem m_savedApp{ nullptr };
+
+        // Loads the start-menu apps (off-thread) then populates the lists.
+        winrt::fire_and_forget LoadAppsAsync();
+
+        // NOTE: coroutine parameters are taken BY VALUE on purpose. A coroutine does
+        // not extend the lifetime of reference parameters across a co_await, so a
+        // reference here would dangle after the first suspension and crash.
+        winrt::fire_and_forget OpenFilePicker(winrt::Microsoft::UI::WindowId windowId);
+
+        winrt::fire_and_forget AddAppToList(AppEntry entry);
+
+        // Rebuilds m_visibleApps from m_allApps using the current search text,
+        // placing the pinned app first.
+        void RefreshVisibleApps();
+    };
+}
+
+namespace winrt::UsefulAIKey::factory_implementation
+{
+    struct AppPickerView : AppPickerViewT<AppPickerView, implementation::AppPickerView>
+    {
+    };
+}
