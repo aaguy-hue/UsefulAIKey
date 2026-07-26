@@ -4,15 +4,12 @@
 #include "AppItem.g.cpp"
 #endif
 
-// These headers give us the WinRT (not Win32/GDI) way to read a file's icon and
-// turn it into something XAML can display:
-//   StorageFile            - a WinRT handle to a file on disk
-//   ThumbnailMode          - asks the shell for the "icon" thumbnail of that file
-//   BitmapImage            - an ImageSource that can be fed from a stream
-#include <winrt/Windows.Storage.h>
-#include <winrt/Windows.Storage.FileProperties.h>
-#include <winrt/Windows.Storage.Streams.h>
+// SoftwareBitmapSource is the XAML ImageSource we can feed a SoftwareBitmap into.
+// WindowsApps.h gives us LoadIconBitmap, which does the shell/GDI extraction.
+#include <winrt/Windows.Graphics.Imaging.h>
 #include <winrt/Microsoft.UI.Xaml.Media.Imaging.h>
+
+#include "WindowsApps.h"
 
 using namespace winrt;
 using namespace winrt::Microsoft::UI::Xaml;
@@ -29,21 +26,21 @@ namespace winrt::UsefulAIKey::implementation
 
     Media::ImageSource AppItem::Logo() { return m_logo; }
 
-    bool AppItem::IsPinned() { return m_isPinned; }
+    bool AppItem::IsSelected() { return m_isSelected; }
 
-    void AppItem::IsPinned(bool value)
+    void AppItem::IsSelected(bool value)
     {
-        if (m_isPinned == value) return;
-        m_isPinned = value;
+        if (m_isSelected == value) return;
+        m_isSelected = value;
         // Two properties change together: the flag itself and the derived
-        // Visibility the XAML pin marker binds to.
-        RaisePropertyChanged(L"IsPinned");
-        RaisePropertyChanged(L"PinIndicatorVisibility");
+        // Visibility the XAML selection highlight binds to.
+        RaisePropertyChanged(L"IsSelected");
+        RaisePropertyChanged(L"SelectionIndicatorVisibility");
     }
 
-    Visibility AppItem::PinIndicatorVisibility()
+    Visibility AppItem::SelectionIndicatorVisibility()
     {
-        return m_isPinned ? Visibility::Visible : Visibility::Collapsed;
+        return m_isSelected ? Visibility::Visible : Visibility::Collapsed;
     }
 
     event_token AppItem::PropertyChanged(Data::PropertyChangedEventHandler const& handler)
@@ -69,34 +66,29 @@ namespace winrt::UsefulAIKey::implementation
         // while we're mid-await) and remember the UI thread so we can come back to it.
         auto lifetime = get_strong();
         auto uiThread = Microsoft::UI::Dispatching::DispatcherQueue::GetForCurrentThread();
-        auto path = m_path;
+        auto path = std::wstring{ m_path.c_str() };
 
         try
         {
-            // --- background work: touch the disk / shell off the UI thread ---
-            auto file = co_await Windows::Storage::StorageFile::GetFileFromPathAsync(path);
+            // background work: the shell/GDI extraction can hit disk, so keep it
+            // off the UI thread
+            co_await resume_background();
+            auto bitmap = LoadIconBitmap(path, 48);
+            if (!bitmap) co_return;
 
-            // ThumbnailMode::SingleItem returns the file's icon (48px is a good size
-            // for a 24px Image with room for high-DPI). This is the app's logo.
-            auto thumbnail = co_await file.GetThumbnailAsync(
-                Windows::Storage::FileProperties::ThumbnailMode::SingleItem, 48);
-
-            if (!thumbnail || thumbnail.Size() == 0) co_return;
-
-            // --- back on the UI thread: XAML objects must be created there ---
+            // back on the UI thread: XAML objects must be created there
             co_await wil::resume_foreground(uiThread);
 
-            Media::Imaging::BitmapImage bitmap;
-            co_await bitmap.SetSourceAsync(thumbnail);
+            Media::Imaging::SoftwareBitmapSource source;
+            co_await source.SetBitmapAsync(bitmap);
 
-            m_logo = bitmap;
+            m_logo = source;
             RaisePropertyChanged(L"Logo");
         }
         catch (hresult_error const&)
         {
-            // Some targets have no readable icon (or the path isn't accessible).
-            // That's fine -- the row just shows no logo. Swallow so one bad icon
-            // doesn't take down the whole list load.
+            // Some targets have no usable icon. That's fine -- the row just shows no
+            // logo. Swallow so one bad icon doesn't take down the whole list load.
         }
     }
 }

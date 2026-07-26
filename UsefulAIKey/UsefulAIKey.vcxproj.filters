@@ -16,11 +16,13 @@
     <ClCompile Include="$(GeneratedFilesDir)module.g.cpp" />
     <ClCompile Include="ActionOption.cpp" />
     <ClCompile Include="AppItem.cpp" />
+    <ClCompile Include="WindowsApps.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="ActionOption.h" />
     <ClInclude Include="AppItem.h" />
+    <ClInclude Include="WindowsApps.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Wide310x150Logo.scale-200.png">

@@ -7,7 +7,7 @@ namespace UsefulAIKey
     // It derives from INotifyPropertyChanged so the UI can react to values that
     // change *after* the row is first shown:
     //   - Logo is loaded asynchronously (the icon appears a moment later)
-    //   - IsPinned flips when the user clicks a row
+    //   - IsSelected flips when the user clicks a row
     [default_interface]
     runtimeclass AppItem : Microsoft.UI.Xaml.Data.INotifyPropertyChanged
     {
@@ -23,13 +23,13 @@ namespace UsefulAIKey
         // PropertyChanged so the bound Image updates itself.
         Microsoft.UI.Xaml.Media.ImageSource Logo{ get; };
 
-        // True when this app is the saved/pinned one. Drives the sort order
-        // (pinned rows float to the top) and the pin marker's visibility.
-        Boolean IsPinned;
+        // True when this app is the chosen one. Drives the sort order (the selected
+        // row floats to the top) and the row's selected-state highlight.
+        Boolean IsSelected;
 
         // Convenience for XAML: WinUI has no built-in bool->Visibility converter,
-        // so we expose the pin marker's Visibility directly off the model. Derived
-        // from IsPinned; kept in sync via PropertyChanged.
-        Microsoft.UI.Xaml.Visibility PinIndicatorVisibility{ get; };
+        // so we expose the selection highlight's Visibility directly off the model.
+        // Derived from IsSelected; kept in sync via PropertyChanged.
+        Microsoft.UI.Xaml.Visibility SelectionIndicatorVisibility{ get; };
     }
 }

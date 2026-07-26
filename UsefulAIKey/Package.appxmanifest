@@ -47,8 +47,5 @@
 
   <Capabilities>
     <rescap:Capability Name="runFullTrust" />
-    <!-- Lets StorageFile.GetFileFromPathAsync read arbitrary paths (e.g. the .exe
-         targets in Program Files) so we can pull each app's icon thumbnail. -->
-    <rescap:Capability Name="broadFileSystemAccess" />
   </Capabilities>
 </Package>

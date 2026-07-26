@@ -13,10 +13,10 @@ namespace winrt::UsefulAIKey::implementation
 
         Microsoft::UI::Xaml::Media::ImageSource Logo();
 
-        bool IsPinned();
-        void IsPinned(bool value);
+        bool IsSelected();
+        void IsSelected(bool value);
 
-        Microsoft::UI::Xaml::Visibility PinIndicatorVisibility();
+        Microsoft::UI::Xaml::Visibility SelectionIndicatorVisibility();
 
         // INotifyPropertyChanged. cppwinrt lets us back the projected event with a
         // winrt::event; XAML subscribes through these and we fire it in RaisePropertyChanged.
@@ -33,7 +33,7 @@ namespace winrt::UsefulAIKey::implementation
         hstring m_path;
 
         Microsoft::UI::Xaml::Media::ImageSource m_logo{ nullptr };
-        bool m_isPinned{ false };
+        bool m_isSelected{ false };
         winrt::event<Microsoft::UI::Xaml::Data::PropertyChangedEventHandler> m_propertyChanged;
 
         void RaisePropertyChanged(hstring const& propertyName);

@@ -98,9 +98,9 @@ namespace winrt::UsefulAIKey::implementation
 
         std::wstring query = ToLower(std::wstring_view{ SearchBox().Text() });
 
-        // Two passes so the pinned app always sits on top. m_allApps is already
+        // Two passes so the selected app always sits on top. m_allApps is already
         // sorted by name, so each group stays alphabetical.
-        std::vector<UsefulAIKey::AppItem> pinned;
+        std::vector<UsefulAIKey::AppItem> selected;
         std::vector<UsefulAIKey::AppItem> rest;
         for (auto const& item : m_allApps)
         {
@@ -110,14 +110,14 @@ namespace winrt::UsefulAIKey::implementation
                 if (name.find(query) == std::wstring::npos) continue;
             }
 
-            if (item.IsPinned())
-                pinned.push_back(item);
+            if (item.IsSelected())
+                selected.push_back(item);
             else
                 rest.push_back(item);
         }
 
         m_visibleApps.Clear();
-        for (auto const& item : pinned) m_visibleApps.Append(item);
+        for (auto const& item : selected) m_visibleApps.Append(item);
         for (auto const& item : rest) m_visibleApps.Append(item);
     }
 
@@ -135,14 +135,14 @@ namespace winrt::UsefulAIKey::implementation
         auto item = e.ClickedItem().try_as<UsefulAIKey::AppItem>();
         if (!item) return;
 
-        // Only one saved app at a time: un-pin the previous choice, pin the new one.
+        // Only one saved app at a time: deselect the previous choice, select the new one.
         if (m_savedApp && m_savedApp != item)
-            m_savedApp.IsPinned(false);
+            m_savedApp.IsSelected(false);
 
-        item.IsPinned(true);
+        item.IsSelected(true);
         m_savedApp = item;
 
-        // Reorder so the newly pinned app jumps to the top.
+        // Reorder so the newly selected app jumps to the top.
         RefreshVisibleApps();
 
         // TODO: persist item.Path() as the app the Copilot key should launch.

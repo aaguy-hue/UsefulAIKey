@@ -4,9 +4,13 @@
 #include "pch.h" 
 
 #include <filesystem>
+#include <vector>
 #include <shobjidl.h>
 #include <shlobj.h>
 #include <shlguid.h>
+
+#include <winrt/Windows.Storage.Streams.h>
+#include <winrt/Windows.Security.Cryptography.h>
 
 #include "WindowsApps.h"
 
@@ -110,17 +114,9 @@ std::vector<AppEntry> EnumerateStartMenuApps()
 			// wcslen is a wide-character version of strlen
 			if (wcslen(targetPath) == 0) continue; // skip shortcuts to folders/URLs
 
-			// a single executable can have multiple icons, so the icon index says which icon we got
-			wchar_t iconPath[MAX_PATH]{};
-			int iconIndex;
-			if (FAILED(shellLink->GetIconLocation(iconPath, MAX_PATH, &iconIndex))) {
-				// idk figure out how to deal with this later
-			}
-
 			apps.emplace_back(AppEntry{
 				entry.path().stem().wstring(), // stem() returns the filename without the extension
-				targetPath,
-				iconPath
+				targetPath
 			});
 		}
 	}
@@ -130,4 +126,80 @@ std::vector<AppEntry> EnumerateStartMenuApps()
 	});
 
 	return apps;
+}
+
+// Convert an app's icon into a SoftwareBitmap that can be used in XAML
+winrt::Windows::Graphics::Imaging::SoftwareBitmap LoadIconBitmap(std::wstring const& path, int size)
+{
+	using namespace winrt::Windows::Graphics::Imaging;
+
+	if (path.empty()) return nullptr;
+
+	// IShellItemImageFactory gets an HBITMAP for a file, folder, or other shell item
+	// SHCreateItemFromParsingName turns a file path into a shell object (IShellItem) 
+	// You can then do QueryInterface for IShellItemImageFactory, which has a GetImage
+	// method that returns an HBITMAP of the icon for arbitrary shell items
+	winrt::com_ptr<IShellItemImageFactory> factory;
+	if (FAILED(SHCreateItemFromParsingName(path.c_str(), nullptr, IID_PPV_ARGS(factory.put()))))
+		return nullptr;
+
+	// Requests icon at roughly size px
+	// SIIGBF_ICONONLY forces an icon instead of a document thumbnail/preview
+	// SIIGBF_BIGGERSIZEOK lets it hand back a larger, crisper source that we can scale down instead of upscaling a smaller one
+	// The result is a 32bpp HBITMAP whose pixels are premultiplied BGRA
+	// (RGB but different order, alpha is premultiplied into the color channels)
+	SIZE requestedSize{ size, size };
+	HBITMAP bitmap = nullptr;
+	if (FAILED(factory->GetImage(requestedSize, SIIGBF_ICONONLY | SIIGBF_BIGGERSIZEOK, &bitmap)) || !bitmap)
+		return nullptr;
+
+	// Unlike COM objects, GDI handles aren't reference counted
+	// this code uses a RAII guard to make sure we DeleteObject on every exit, even if we return early
+	struct BitmapGuard { HBITMAP h; ~BitmapGuard() { if (h) DeleteObject(h); } } guard{ bitmap };
+
+	// Determine icon size bc BIGGERSIZEOK means it may not equal size
+	BITMAP info{};
+	if (GetObjectW(bitmap, sizeof(info), &info) == 0) return nullptr;
+	const int width = info.bmWidth;
+	const int height = info.bmHeight;
+	if (width <= 0 || height <= 0) return nullptr;
+
+	// Copy HBITMAP's pixels into our own buffer
+	// Negative biHeight asks GDI for top-down rows (the order SoftwareBitmap wants)
+	// 32bpp BI_RGB gives us BGRA bytes
+	BITMAPINFO dib{};
+	dib.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	dib.bmiHeader.biWidth = width;
+	dib.bmiHeader.biHeight = -height;
+	dib.bmiHeader.biPlanes = 1;
+	dib.bmiHeader.biBitCount = 32;
+	dib.bmiHeader.biCompression = BI_RGB;
+
+	// GetDC gets the "device context", which is basically a drawable surface & its properties
+	// Here, since we pass nullptr, it gets the DC for the whole screen rather than some window
+	// GetDIBits loads the pixel bits into a vector
+	std::vector<uint8_t> pixels(static_cast<size_t>(width) * height * 4);
+	HDC screen = GetDC(nullptr);
+	int scanned = GetDIBits(screen, bitmap, 0, height, pixels.data(), &dib, DIB_RGB_COLORS);
+	ReleaseDC(nullptr, screen);
+	if (scanned == 0) return nullptr;
+
+	// Some icons come back with a fully-zero alpha channel ("no alpha info"), which would be fully transparent
+	// Here, we detect that case and force the icon opaque so it actually shows
+	bool anyAlpha = false;
+	for (size_t i = 3; i < pixels.size(); i += 4)
+	{
+		if (pixels[i] != 0) { anyAlpha = true; break; }
+	}
+	if (!anyAlpha)
+	{
+		for (size_t i = 3; i < pixels.size(); i += 4) pixels[i] = 255;
+	}
+
+	// CryptographicBuffer seems a little odd but this static method is just an easy way to make an IBuffer from a byte array
+	// We then copy the bytes from the IBuffer into a SoftwareBitmap
+	// SoftwareBitmapSource needs a SoftwareBitmap in BGRA8 + premultiplied format so this works yay
+	auto buffer = winrt::Windows::Security::Cryptography::CryptographicBuffer::CreateFromByteArray(pixels);
+	return SoftwareBitmap::CreateCopyFromBuffer(
+		buffer, BitmapPixelFormat::Bgra8, width, height, BitmapAlphaMode::Premultiplied);
 }
