@@ -28,7 +28,8 @@
                         TextChanged="SearchBox_TextChanged" />
 
         <!-- The app list. IsItemClickEnabled makes each row a button (raises
-             ItemClick); we handle that to pin the chosen app to the top. -->
+             ItemClick); we handle that to select the chosen app and float it to
+             the top. -->
         <ListView x:Name="AppsList"
                   Width="400" Height="360"
                   SelectionMode="None"
@@ -36,28 +37,34 @@
                   ItemClick="AppsList_ItemClick">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="local:AppItem">
-                    <Grid ColumnSpacing="12" Padding="4,6">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
+                    <Grid MinHeight="40">
+                        <!-- Selected-state highlight: a subtle rounded fill behind
+                             the row, shown only for the chosen app. -->
+                        <Border Background="{ThemeResource SubtleFillColorSecondaryBrush}"
+                                CornerRadius="6"
+                                Visibility="{x:Bind SelectionIndicatorVisibility, Mode=OneWay}"/>
 
-                        <!-- Logo binds OneWay because it loads asynchronously. -->
-                        <Image Grid.Column="0" Width="24" Height="24"
-                               Source="{x:Bind Logo, Mode=OneWay}"/>
+                        <!-- Accent bar down the left edge of the selected row. -->
+                        <Border Width="3" CornerRadius="1.5" Margin="0,6"
+                                HorizontalAlignment="Left"
+                                Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                Visibility="{x:Bind SelectionIndicatorVisibility, Mode=OneWay}"/>
 
-                        <TextBlock Grid.Column="1"
-                                   Text="{x:Bind Name}"
-                                   VerticalAlignment="Center"
-                                   TextTrimming="CharacterEllipsis"/>
+                        <Grid ColumnSpacing="12" Padding="14,6,10,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
 
-                        <!-- Pin marker: shown only when this app is the saved one. -->
-                        <FontIcon Grid.Column="2"
-                                  FontFamily="Segoe Fluent Icons"
-                                  Glyph="&#xE840;"
-                                  FontSize="14"
-                                  Visibility="{x:Bind PinIndicatorVisibility, Mode=OneWay}"/>
+                            <!-- Logo binds OneWay because it loads asynchronously. -->
+                            <Image Grid.Column="0" Width="24" Height="24"
+                                   Source="{x:Bind Logo, Mode=OneWay}"/>
+
+                            <TextBlock Grid.Column="1"
+                                       Text="{x:Bind Name}"
+                                       VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"/>
+                        </Grid>
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
