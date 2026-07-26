@@ -23,12 +23,12 @@
         <!-- Search box: filters the list below as you type. -->
         <StackPanel Orientation="Horizontal">
             <AutoSuggestBox x:Name="SearchBox"
-                        Width="325"
+                        Width="350"
                         PlaceholderText="Search apps..."
                         QueryIcon="Find"
                         TextChanged="SearchBox_TextChanged" />
             <Button Style="{StaticResource AccentButtonStyle}"
-                    Width="125"
+                    Width="50"
                     Content="Browse for app..." 
                 />
         </StackPanel>
@@ -37,7 +37,7 @@
              ItemClick); we handle that to select the chosen app and float it to
              the top. -->
         <ListView x:Name="AppsList"
-                  Width="450" Height="360"
+                  Width="400" Height="360"
                   SelectionMode="None"
                   IsItemClickEnabled="True"
                   ItemClick="AppsList_ItemClick">
