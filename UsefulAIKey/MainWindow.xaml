@@ -22,5 +22,9 @@
         </ComboBox>
 
         <Line></Line>
+
+        <ScrollViewer Height="200" Width="400">
+            <TextBox x:Name="OutputTextBox" AcceptsReturn="True" TextWrapping="Wrap" IsReadOnly="True"/>
+        </ScrollViewer>
     </StackPanel>
 </Window>

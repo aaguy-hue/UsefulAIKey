@@ -1,16 +1,20 @@
+// pch.h should always be the first include in a cpp file, it includes windows.h and other necessary headers
+// https://stackoverflow.com/questions/54121917/what-is-pch-h-and-why-is-it-needed-to-be-included-as-the-first-header-file
+// if you include headers before pch.h, you may get errors about missing definitions or symbols, since pch.h sets up the necessary environment for the rest of the code to compile correctly
+#include "pch.h" 
+
 #include <filesystem>
 #include <shobjidl.h>
 #include <shlobj.h>
 #include <shlguid.h>
 
-#include "pch.h"
 #include "WindowsApps.h"
 
 // I'm not very familiar with windows programming and COM so this will be heavily commented
 // to help me understand better by talking through the concepts, with some links to the docs
 
 // the windows shell is the GUI for windows (largely implemented by explorer.exe)
-// COM is a language-independent interface that allows objs in diff langs to interact
+// COM is a language-independent abi that allows objs in diff langs to interact
 // shobjidl.h lets you interact with windows shell and com objects
 // shlboj.h defines the interfaces for windows shell and com objs
 // shlguid.h defines guids for windows shell
@@ -29,7 +33,7 @@ std::vector<AppEntry> EnumerateStartMenuApps()
 	std::vector<AppEntry> apps;
 
 	// PWSTR is a pointer to a wide string, aka a wchar_t*
-	// aka it's just a unicode string since unicode charas are wide
+	// aka it's just a unicode string since unicode charas are utf-16 on windows
 	PWSTR pathbuf = nullptr;
 
 	fs::path roots[2];
@@ -94,7 +98,7 @@ std::vector<AppEntry> EnumerateStartMenuApps()
 	for (auto& root : roots) {
 		if (root.empty() || !fs::exists(root)) continue;
 		
-		for (auto& entry : fs::recursive_directory_iterator(root)) {
+		for (auto& entry : fs::recursive_directory_iterator(root, fs::directory_options::skip_permission_denied)) {
 			if (entry.path().extension() != L".lnk") continue;
 
 			// Attempt to load the 
@@ -110,14 +114,16 @@ std::vector<AppEntry> EnumerateStartMenuApps()
 			// wcslen is a wide-character version of strlen
 			if (wcslen(targetPath) == 0) continue; // skip shortcuts to folders/URLs
 
-			AppEntry app;
-			app.name = entry.path().stem().wstring(); // stem() returns the filename without the extension
-			app.path = targetPath;
-			apps.push_back(std::move(app)); // std::move turns it into an rvalue so we can move the str instead of copying
+			apps.emplace_back(AppEntry{
+				entry.path().stem().wstring(), // stem() returns the filename without the extension
+				targetPath
+			});
 		}
 	}
 
 	std::sort(apps.begin(), apps.end(), [](const AppEntry& a, const AppEntry& b) {
 		return a.name < b.name;
 	});
+
+	return apps;
 }
