@@ -190,6 +190,7 @@ namespace winrt::UsefulAIKey::implementation
 				// Select the existing app in the list
                 if (m_savedApp) m_savedApp.IsSelected(false);
                 app.IsSelected(true);
+				RefreshVisibleApps();
                 co_return;
             }
         }
