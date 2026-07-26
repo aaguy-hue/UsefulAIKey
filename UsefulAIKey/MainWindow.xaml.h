@@ -23,6 +23,8 @@ namespace winrt::UsefulAIKey::implementation
         // Kept alive as a member so the ComboBox's ItemsSource stays valid for the
         // lifetime of the window.
         winrt::Windows::Foundation::Collections::IObservableVector<winrt::UsefulAIKey::ActionOption> m_options{ nullptr };
+
+        winrt::UsefulAIKey::AppPickerView m_appPickerView{ nullptr };
     };
 }
 

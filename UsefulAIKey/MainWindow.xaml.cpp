@@ -69,7 +69,9 @@ namespace winrt::UsefulAIKey::implementation
     void MainWindow::ShowLaunchAppView()
     {
         OutputDebugStringW(L"Selected: LaunchApp\n");
-		UserSelectionStuff().Content(winrt::UsefulAIKey::AppPickerView());
+
+        if (!m_appPickerView) m_appPickerView = winrt::UsefulAIKey::AppPickerView();
+		UserSelectionStuff().Content(m_appPickerView);
     }
 }
 
