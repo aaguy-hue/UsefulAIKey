@@ -1,5 +1,6 @@
 #pragma once
 
+#include "WindowsApps.h"
 #include "MainWindow.g.h"
 
 namespace winrt::UsefulAIKey::implementation
@@ -16,6 +17,7 @@ namespace winrt::UsefulAIKey::implementation
         void MyProperty(int32_t value);
         void Action_SelectionChanged(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::Controls::SelectionChangedEventArgs const& e);
         void InitializeComponent();
+
 
         // App-picker event handlers, wired up from MainWindow.xaml.
         void SearchBox_TextChanged(winrt::Microsoft::UI::Xaml::Controls::AutoSuggestBox const& sender, winrt::Microsoft::UI::Xaml::Controls::AutoSuggestBoxTextChangedEventArgs const& args);
@@ -40,7 +42,14 @@ namespace winrt::UsefulAIKey::implementation
         // Loads the start-menu apps (off-thread) then populates the lists.
         winrt::fire_and_forget LoadAppsAsync();
 
-        winrt::fire_and_forget OpenFilePicker(winrt::Microsoft::UI::WindowId windowId);
+        // NOTE: coroutine parameters are taken BY VALUE on purpose. A coroutine does
+        // not extend the lifetime of reference parameters across a co_await, so a
+        // reference here would dangle after the first suspension and crash.
+        winrt::fire_and_forget OpenFilePicker(winrt::Microsoft::UI::WindowId windowId,
+            winrt::Microsoft::UI::Xaml::XamlRoot xamlRoot);
+
+        winrt::fire_and_forget AddAppToList(AppEntry entry,
+            winrt::Microsoft::UI::Xaml::XamlRoot xamlRoot);
 
         // Rebuilds m_visibleApps from m_allApps using the current search text,
         // placing the pinned app first.

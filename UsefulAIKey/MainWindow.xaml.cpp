@@ -175,10 +175,41 @@ namespace winrt::UsefulAIKey::implementation
 
     void MainWindow::BrowseForApp_Click(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::RoutedEventArgs const& e)
     {
-        OpenFilePicker(this->AppWindow().Id());
+        auto button = sender.try_as<Controls::Button>();
+        if (!button) return;
+
+        OpenFilePicker(this->AppWindow().Id(), button.XamlRoot());
     }
 
-    winrt::fire_and_forget MainWindow::OpenFilePicker(winrt::Microsoft::UI::WindowId windowId)
+    winrt::fire_and_forget MainWindow::AddAppToList(AppEntry entry, XamlRoot xamlRoot)
+    {
+        auto lifetime = get_strong();
+        // check for duplicates first
+        for (auto& app : m_allApps)
+        {
+            if (app.Path() == entry.path)
+            {
+                using namespace winrt::Microsoft::UI::Xaml::Controls;
+                ContentDialog dialog;
+                // winrt::box_value boxes C++ scalar values into IInspectable objects
+                dialog.XamlRoot(xamlRoot);
+                dialog.Title(box_value(L"Fail"));
+                dialog.Content(box_value(L"This app is already in the list."));
+				dialog.PrimaryButtonText(L"OK");
+                co_await dialog.ShowAsync();
+                co_return;
+            }
+        }
+        auto item = make<implementation::AppItem>(hstring{ entry.name }, hstring{ entry.path });
+        m_allApps.push_back(item);
+        RefreshVisibleApps();
+
+        // Load each icon in the background; the row updates itself when ready.
+        get_self<implementation::AppItem>(item)->LoadIconAsync();
+        RefreshVisibleApps();
+	}
+
+    winrt::fire_and_forget MainWindow::OpenFilePicker(winrt::Microsoft::UI::WindowId windowId, XamlRoot xamlRoot)
     {
         winrt::Microsoft::Windows::Storage::Pickers::FileOpenPicker picker(windowId);
         picker.SuggestedStartLocation(winrt::Microsoft::Windows::Storage::Pickers::PickerLocationId::ComputerFolder);
@@ -192,10 +223,14 @@ namespace winrt::UsefulAIKey::implementation
 
 		auto result = co_await picker.PickSingleFileAsync();
 
-        if (result)
-        {
-
-        }
+        // the picking was cancelled
+        if (!result) co_return;
+        
+        // Copy the path into our own wstring. result.Path() returns a temporary
+        // hstring, so holding its raw c_str() pointer would dangle immediately.
+        std::wstring path{ result.Path() };
+        AppEntry entry = { .name = path, .path = path };
+        AddAppToList(entry, xamlRoot);
     }
 }
 
