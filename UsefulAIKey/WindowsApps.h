@@ -1,5 +1,4 @@
 #pragma once
-class WindowsApps
-{
-};
 
+struct AppEntry;
+std::vector<AppEntry> EnumerateStartMenuApps();

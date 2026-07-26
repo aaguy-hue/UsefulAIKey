@@ -32,7 +32,7 @@ std::vector<AppEntry> EnumerateStartMenuApps()
 	// aka it's just a unicode string since unicode charas are wide
 	PWSTR pathbuf = nullptr;
 
-	std::vector<fs::path> roots;
+	fs::path roots[2];
 	
 	// Folders like FOLDERID_CommonPrograms are "known folders" in Windows that have a special meaning
 	// See https://learn.microsoft.com/en-us/windows/win32/shell/known-folders
@@ -42,15 +42,15 @@ std::vector<AppEntry> EnumerateStartMenuApps()
 	// dwFlags - Flags for specific retrieval options, I don't need any
 	// hToken - Access token for a user, when null, it uses the current user
 	// ppszPath - Pointer to a null-terminated unicode string to store the path in
-	if (SUCCEEDED(SHGetFolderPath(FOLDERID_CommonPrograms, 0, nullptr, 0, &pathbuf)))
+	if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_CommonPrograms, 0, nullptr, &pathbuf)))
 	{
-		roots.push_back(pathbuf);
+		roots[0] = pathbuf;
 		CoTaskMemFree(pathbuf);
 	}
 
-	if (SUCCEEDED(SHGetFolderPath(FOLDERID_Programs, 0, nullptr, 0, &pathbuf)))
+	if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Programs, 0, nullptr, &pathbuf)))
 	{
-		roots.push_back(pathbuf);
+		roots[1] = pathbuf;
 		CoTaskMemFree(pathbuf);
 	}
 
@@ -74,6 +74,12 @@ std::vector<AppEntry> EnumerateStartMenuApps()
 	// manage the reference count (c++ shared_ptr), we instead use AddRef() and Release() to manage the internal
 	// reference count, and com_ptr calls them for us automatically
 	// 
+	// The CLSID_ShellLink is the CLSID for the ShellLink object, which implements IShellLinkW but also IPersistFile
+	// IUnknown always has QueryInterface (as well as AddRef/Release), so we use QueryInterface to ask the ShellLink
+	// obj for its IPersistFile interface, which we can then use to load the .lnk file and get the target path
+	// .as<interface>() is a convenience method thta calls QueryInterface and checks the result, returning a com_ptr 
+	// of the requested interface type
+	// 
 	// These links explain a lot about how COM works and how to use it in C++: 
 	// https://learn.microsoft.com/en-us/windows/win32/com/the-component-object-model
 	// https://learn.microsoft.com/en-us/windows/apps/develop/cpp-winrt/consume-com
@@ -83,4 +89,35 @@ std::vector<AppEntry> EnumerateStartMenuApps()
 	winrt::check_hresult(
 		CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(shellLink.put()))
 	);
+	persistFile = shellLink.as<IPersistFile>();
+
+	for (auto& root : roots) {
+		if (root.empty() || !fs::exists(root)) continue;
+		
+		for (auto& entry : fs::recursive_directory_iterator(root)) {
+			if (entry.path().extension() != L".lnk") continue;
+
+			// Attempt to load the 
+			if (FAILED(persistFile->Load(entry.path().c_str(), STGM_READ))) continue;
+
+			// Get the target path of the .lnk file
+			// WIN32_FIND_DATAW is a struct that contains information about a file found by FindFirstFile/FindNextFile
+			//SLGP_UNCPRIORITY is a flag that tells GetPath to return the UNC path if available, otherwise return the local path
+			wchar_t targetPath[MAX_PATH]{};
+			WIN32_FIND_DATAW findData{};
+			if (FAILED(shellLink->GetPath(targetPath, MAX_PATH, &findData, SLGP_UNCPRIORITY))) continue;
+
+			// wcslen is a wide-character version of strlen
+			if (wcslen(targetPath) == 0) continue; // skip shortcuts to folders/URLs
+
+			AppEntry app;
+			app.name = entry.path().stem().wstring(); // stem() returns the filename without the extension
+			app.path = targetPath;
+			apps.push_back(std::move(app)); // std::move turns it into an rvalue so we can move the str instead of copying
+		}
+	}
+
+	std::sort(apps.begin(), apps.end(), [](const AppEntry& a, const AppEntry& b) {
+		return a.name < b.name;
+	});
 }
