@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Margin="16" Spacing="8">
+    <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Spacing="8">
         
         <!-- Search box: filters the list below as you type. -->
         <StackPanel Orientation="Horizontal">
