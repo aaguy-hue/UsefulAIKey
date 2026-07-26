@@ -6,7 +6,7 @@ namespace winrt::UsefulAIKey::implementation
 {
     struct AppItem : AppItemT<AppItem>
     {
-        AppItem(hstring const& name, hstring const& path, hstring const& iconPath);
+        AppItem(hstring const& name, hstring const& path);
 
         hstring Name();
         hstring Path();
@@ -23,10 +23,14 @@ namespace winrt::UsefulAIKey::implementation
         winrt::event_token PropertyChanged(Microsoft::UI::Xaml::Data::PropertyChangedEventHandler const& handler);
         void PropertyChanged(winrt::event_token const& token) noexcept;
 
+        // Fire-and-forget coroutine that fetches the target's icon and assigns Logo.
+        // MUST be called on the UI thread -- it captures that thread's DispatcherQueue
+        // so it can hop back to build the XAML BitmapImage after the async I/O.
+        winrt::fire_and_forget LoadIconAsync();
+
     private:
         hstring m_name;
         hstring m_path;
-        //hstring m_iconPath;
 
         Microsoft::UI::Xaml::Media::ImageSource m_logo{ nullptr };
         bool m_isPinned{ false };

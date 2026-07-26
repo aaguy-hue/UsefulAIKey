@@ -11,7 +11,7 @@ namespace UsefulAIKey
     [default_interface]
     runtimeclass AppItem : Microsoft.UI.Xaml.Data.INotifyPropertyChanged
     {
-        AppItem(String name, String path, String iconPath);
+        AppItem(String name, String path);
 
         // Display name shown in the list (set once, so no setter needed).
         String Name{ get; };

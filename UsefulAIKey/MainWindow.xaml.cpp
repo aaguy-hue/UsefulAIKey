@@ -82,11 +82,11 @@ namespace winrt::UsefulAIKey::implementation
         m_allApps.reserve(entries.size());
         for (auto const& entry : entries)
         {
-            auto item = make<implementation::AppItem>(hstring{ entry.name }, hstring{ entry.path }, hstring {entry.iconPath});
+            auto item = make<implementation::AppItem>(hstring{ entry.name }, hstring{ entry.path });
             m_allApps.push_back(item);
 
             // Load each icon in the background; the row updates itself when ready.
-            //get_self<implementation::AppItem>(item)->LoadIconAsync();
+            get_self<implementation::AppItem>(item)->LoadIconAsync();
         }
 
         RefreshVisibleApps();
