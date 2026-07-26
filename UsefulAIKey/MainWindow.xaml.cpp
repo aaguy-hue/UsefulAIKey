@@ -202,6 +202,9 @@ namespace winrt::UsefulAIKey::implementation
         }
         auto item = make<implementation::AppItem>(hstring{ entry.name }, hstring{ entry.path });
         m_allApps.push_back(item);
+        if (m_savedApp) m_savedApp.IsSelected(false);
+		item.IsSelected(true);
+
         RefreshVisibleApps();
 
         // Load each icon in the background; the row updates itself when ready.
