@@ -1,0 +1,35 @@
+namespace UsefulAIKey
+{
+    // One row in the app-picker list. It is a runtimeclass (not a plain C++ struct)
+    // because XAML data binding can only bind to WinRT types, and x:Bind in the
+    // DataTemplate needs a projected type to generate its binding code against.
+    //
+    // It derives from INotifyPropertyChanged so the UI can react to values that
+    // change *after* the row is first shown:
+    //   - Logo is loaded asynchronously (the icon appears a moment later)
+    //   - IsPinned flips when the user clicks a row
+    [default_interface]
+    runtimeclass AppItem : Microsoft.UI.Xaml.Data.INotifyPropertyChanged
+    {
+        AppItem(String name, String path, String iconPath);
+
+        // Display name shown in the list (set once, so no setter needed).
+        String Name{ get; };
+
+        // Full path to the target .exe. This is what we ultimately save/launch.
+        String Path{ get; };
+
+        // The app's icon. Null until the async load finishes, then raises
+        // PropertyChanged so the bound Image updates itself.
+        Microsoft.UI.Xaml.Media.ImageSource Logo{ get; };
+
+        // True when this app is the saved/pinned one. Drives the sort order
+        // (pinned rows float to the top) and the pin marker's visibility.
+        Boolean IsPinned;
+
+        // Convenience for XAML: WinUI has no built-in bool->Visibility converter,
+        // so we expose the pin marker's Visibility directly off the model. Derived
+        // from IsPinned; kept in sync via PropertyChanged.
+        Microsoft.UI.Xaml.Visibility PinIndicatorVisibility{ get; };
+    }
+}

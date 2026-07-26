@@ -9,8 +9,7 @@
     mc:Ignorable="d"
     Title="UsefulAIKey">
 
-    <StackPanel Orientation="Vertical" HorizontalAlignment="Left">
-        <!--<TextBlock Text="Your Copilot key will..." Margin="10"/>-->
+    <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Margin="16" Spacing="8">
         <ComboBox x:Name="ActionComboBox"
                   SelectionChanged="Action_SelectionChanged"
                   Header="Your Copilot key will..." Width="200">
@@ -21,10 +20,47 @@
             </ComboBox.ItemTemplate>
         </ComboBox>
 
-        <Line></Line>
+        <!-- Search box: filters the list below as you type. -->
+        <AutoSuggestBox x:Name="SearchBox"
+                        Width="400"
+                        PlaceholderText="Search apps..."
+                        QueryIcon="Find"
+                        TextChanged="SearchBox_TextChanged" />
 
-        <ScrollViewer Height="200" Width="400">
-            <TextBox x:Name="OutputTextBox" AcceptsReturn="True" TextWrapping="Wrap" IsReadOnly="True"/>
-        </ScrollViewer>
+        <!-- The app list. IsItemClickEnabled makes each row a button (raises
+             ItemClick); we handle that to pin the chosen app to the top. -->
+        <ListView x:Name="AppsList"
+                  Width="400" Height="360"
+                  SelectionMode="None"
+                  IsItemClickEnabled="True"
+                  ItemClick="AppsList_ItemClick">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="local:AppItem">
+                    <Grid ColumnSpacing="12" Padding="4,6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Logo binds OneWay because it loads asynchronously. -->
+                        <Image Grid.Column="0" Width="24" Height="24"
+                               Source="{x:Bind Logo, Mode=OneWay}"/>
+
+                        <TextBlock Grid.Column="1"
+                                   Text="{x:Bind Name}"
+                                   VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"/>
+
+                        <!-- Pin marker: shown only when this app is the saved one. -->
+                        <FontIcon Grid.Column="2"
+                                  FontFamily="Segoe Fluent Icons"
+                                  Glyph="&#xE840;"
+                                  FontSize="14"
+                                  Visibility="{x:Bind PinIndicatorVisibility, Mode=OneWay}"/>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
     </StackPanel>
 </Window>

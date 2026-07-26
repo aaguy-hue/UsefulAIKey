@@ -22,11 +22,7 @@
 
 namespace fs = std::filesystem;
 
-struct AppEntry
-{
-	std::wstring name;
-	std::wstring path;
-};
+// AppEntry is now defined in WindowsApps.h so other files can use it too.
 
 std::vector<AppEntry> EnumerateStartMenuApps()
 {
@@ -114,9 +110,17 @@ std::vector<AppEntry> EnumerateStartMenuApps()
 			// wcslen is a wide-character version of strlen
 			if (wcslen(targetPath) == 0) continue; // skip shortcuts to folders/URLs
 
+			// a single executable can have multiple icons, so the icon index says which icon we got
+			wchar_t iconPath[MAX_PATH]{};
+			int iconIndex;
+			if (FAILED(shellLink->GetIconLocation(iconPath, MAX_PATH, &iconIndex))) {
+				// idk figure out how to deal with this later
+			}
+
 			apps.emplace_back(AppEntry{
 				entry.path().stem().wstring(), // stem() returns the filename without the extension
-				targetPath
+				targetPath,
+				iconPath
 			});
 		}
 	}

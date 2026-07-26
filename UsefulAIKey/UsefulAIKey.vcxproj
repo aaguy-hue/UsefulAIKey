@@ -138,6 +138,7 @@
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="ActionOption.h" />
+    <ClInclude Include="AppItem.h" />
     <ClInclude Include="App.xaml.h">
       <DependentUpon>App.xaml</DependentUpon>
     </ClInclude>
@@ -155,6 +156,7 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="ActionOption.cpp" />
+    <ClCompile Include="AppItem.cpp" />
     <ClCompile Include="App.xaml.cpp">
       <DependentUpon>App.xaml</DependentUpon>
     </ClCompile>
@@ -166,6 +168,9 @@
   </ItemGroup>
   <ItemGroup>
     <Midl Include="ActionOption.idl">
+      <SubType>Code</SubType>
+    </Midl>
+    <Midl Include="AppItem.idl">
       <SubType>Code</SubType>
     </Midl>
     <Midl Include="MainWindow.idl">

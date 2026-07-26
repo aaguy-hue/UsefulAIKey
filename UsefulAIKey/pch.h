@@ -19,7 +19,11 @@
 #include <winrt/Microsoft.UI.Xaml.Interop.h>
 #include <winrt/Microsoft.UI.Xaml.Markup.h>
 #include <winrt/Microsoft.UI.Xaml.Media.h>
+#include <winrt/Microsoft.UI.Xaml.Media.Imaging.h>
 #include <winrt/Microsoft.UI.Xaml.Navigation.h>
 #include <winrt/Microsoft.UI.Xaml.Shapes.h>
 #include <winrt/Microsoft.UI.Dispatching.h>
+#include <winrt/Windows.Storage.h>
+#include <winrt/Windows.Storage.FileProperties.h>
+#include <winrt/Windows.Storage.Streams.h>
 #include <wil/cppwinrt_helpers.h>
