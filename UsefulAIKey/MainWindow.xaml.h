@@ -20,6 +20,7 @@ namespace winrt::UsefulAIKey::implementation
         // App-picker event handlers, wired up from MainWindow.xaml.
         void SearchBox_TextChanged(winrt::Microsoft::UI::Xaml::Controls::AutoSuggestBox const& sender, winrt::Microsoft::UI::Xaml::Controls::AutoSuggestBoxTextChangedEventArgs const& args);
         void AppsList_ItemClick(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::Controls::ItemClickEventArgs const& e);
+        void BrowseForApp_Click(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::RoutedEventArgs const& e);
 
     private:
         // Kept alive as a member so the ComboBox's ItemsSource stays valid for the
@@ -38,6 +39,8 @@ namespace winrt::UsefulAIKey::implementation
 
         // Loads the start-menu apps (off-thread) then populates the lists.
         winrt::fire_and_forget LoadAppsAsync();
+
+        winrt::fire_and_forget OpenFilePicker(winrt::Microsoft::UI::WindowId windowId);
 
         // Rebuilds m_visibleApps from m_allApps using the current search text,
         // placing the pinned app first.

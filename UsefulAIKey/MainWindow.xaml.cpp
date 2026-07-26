@@ -172,4 +172,31 @@ namespace winrt::UsefulAIKey::implementation
             break;
         }
     }
+
+    void MainWindow::BrowseForApp_Click(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::RoutedEventArgs const& e)
+    {
+        OpenFilePicker(this->AppWindow().Id());
+    }
+
+    winrt::fire_and_forget MainWindow::OpenFilePicker(winrt::Microsoft::UI::WindowId windowId)
+    {
+        winrt::Microsoft::Windows::Storage::Pickers::FileOpenPicker picker(windowId);
+        picker.SuggestedStartLocation(winrt::Microsoft::Windows::Storage::Pickers::PickerLocationId::ComputerFolder);
+        picker.CommitButtonText(L"Select App");
+
+        //picker.FileTypeFilter().ReplaceAll({ L".txt", L".cpp", L".h" });
+        picker.FileTypeFilter().Append(L".exe");
+        picker.FileTypeFilter().Append(L".bat");
+        picker.FileTypeFilter().Append(L".cmd");
+        picker.FileTypeFilter().Append(L".ps1");
+
+		auto result = co_await picker.PickSingleFileAsync();
+
+        if (result)
+        {
+
+        }
+    }
 }
+
+

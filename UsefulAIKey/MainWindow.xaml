@@ -30,6 +30,7 @@
             <Button Style="{StaticResource AccentButtonStyle}"
                     Width="125"
                     Content="Browse for app..." 
+                    Click="BrowseForApp_Click"
                 />
         </StackPanel>
 
