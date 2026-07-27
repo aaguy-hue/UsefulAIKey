@@ -115,12 +115,7 @@ namespace winrt::UsefulAIKey::implementation
         auto item = e.ClickedItem().try_as<UsefulAIKey::AppItem>();
         if (!item) return;
 
-        // Only one saved app at a time: deselect the previous choice, select the new one.
-        if (m_savedApp && m_savedApp != item)
-            m_savedApp.IsSelected(false);
-
-        item.IsSelected(true);
-        m_savedApp = item;
+        SelectApp(item);
 
         // Reorder so the newly selected app jumps to the top.
         RefreshVisibleApps();
@@ -179,21 +174,27 @@ namespace winrt::UsefulAIKey::implementation
                 co_await dialog.ShowAsync();
 
 				// Select the existing app in the list
-                if (m_savedApp) m_savedApp.IsSelected(false);
-                app.IsSelected(true);
-				RefreshVisibleApps();
+                SelectApp(app);
                 co_return;
             }
         }
         auto item = make<implementation::AppItem>(hstring{ entry.name }, hstring{ entry.path });
         m_allApps.push_back(item);
-        if (m_savedApp) m_savedApp.IsSelected(false);
-        item.IsSelected(true);
-
+        SelectApp(item);
         RefreshVisibleApps();
 
         // Load each icon in the background; the row updates itself when ready.
         get_self<implementation::AppItem>(item)->LoadIconAsync();
+    }
+
+    void AppPickerView::SelectApp(UsefulAIKey::AppItem const& item)
+    {
+        if (!item) return;
+
+        if (m_savedApp && m_savedApp != item) m_savedApp.IsSelected(false);
+        item.IsSelected(true);
+
+        m_savedApp = item;
         RefreshVisibleApps();
     }
 

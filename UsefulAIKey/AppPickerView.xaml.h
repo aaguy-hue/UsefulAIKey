@@ -40,6 +40,7 @@ namespace winrt::UsefulAIKey::implementation
         winrt::fire_and_forget OpenFilePicker(winrt::Microsoft::UI::WindowId windowId);
 
         winrt::fire_and_forget AddAppToList(AppEntry entry);
+        void SelectApp(UsefulAIKey::AppItem const& item);
 
         // Rebuilds m_visibleApps from m_allApps using the current search text,
         // placing the pinned app first.
