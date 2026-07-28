@@ -12,9 +12,9 @@
         <TextBlock Text="Select a file to open:" />
 
         <StackPanel Orientation="Horizontal" Spacing="8">
-            <TextBox x:Name="FileNameTextBox" Width="325" IsReadOnly="True" />
+            <TextBox x:Name="FileNameTextBox" Width="375" IsReadOnly="True" />
             <Button Content="Open File..." Click="OpenFileMenu_Click"
-                    Width="125" Style="{StaticResource AccentButtonStyle}" />
+                    Width="75" Style="{StaticResource AccentButtonStyle}" />
         </StackPanel>
     </StackPanel>
 </UserControl>

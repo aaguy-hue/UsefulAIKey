@@ -24,7 +24,7 @@
         <Rectangle 
             Height="1" 
             Fill="Black" 
-            Margin="-16,5,-16,5" />
+            Margin="-8,5,-8,5" />
 
         <ContentControl x:Name="UserSelectionStuff" />
     </StackPanel>

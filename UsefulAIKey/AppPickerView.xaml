@@ -28,7 +28,7 @@
              ItemClick); we handle that to select the chosen app and float it to
              the top. -->
         <ListView x:Name="AppsList"
-                  Width="450" Height="360"
+                  Width="458" Height="360"
                   SelectionMode="None"
                   IsItemClickEnabled="True"
                   ItemClick="AppsList_ItemClick">
