@@ -1,0 +1,10 @@
+namespace UsefulAIKey
+{
+    [default_interface]
+    runtimeclass WebsiteLaunchView : Microsoft.UI.Xaml.Controls.UserControl
+    {
+        WebsiteLaunchView();
+
+        void Load(String savedWebsite);
+    }
+}

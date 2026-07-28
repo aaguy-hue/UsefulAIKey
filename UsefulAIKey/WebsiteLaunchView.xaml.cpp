@@ -1,7 +1,7 @@
 #include "pch.h"
-#include "UserControl.xaml.h"
-#if __has_include("UserControl.g.cpp")
-#include "UserControl.g.cpp"
+#include "WebsiteLaunchView.xaml.h"
+#if __has_include("WebsiteLaunchView.g.cpp")
+#include "WebsiteLaunchView.g.cpp"
 #endif
 
 using namespace winrt;
@@ -12,13 +12,9 @@ using namespace Microsoft::UI::Xaml;
 
 namespace winrt::UsefulAIKey::implementation
 {
-    int32_t UserControl::MyProperty()
+    void WebsiteLaunchView::Load(hstring const& savedWebsite)
     {
-        throw hresult_not_implemented();
-    }
-
-    void UserControl::MyProperty(int32_t /* value */)
-    {
-        throw hresult_not_implemented();
+        m_savedWebsite = savedWebsite;
+        PopulateWebsiteField();
     }
 }
