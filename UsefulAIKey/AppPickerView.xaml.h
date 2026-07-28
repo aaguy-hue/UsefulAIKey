@@ -16,6 +16,10 @@ namespace winrt::UsefulAIKey::implementation
 
         void InitializeComponent();
 
+        // Called by the host (MainWindow) to start loading, handing us the saved app
+        // path so we don't have to read the settings file a second time.
+        void Load(hstring const& savedAppPath);
+
         // Event handlers
         void SearchBox_TextChanged(winrt::Microsoft::UI::Xaml::Controls::AutoSuggestBox const& sender, winrt::Microsoft::UI::Xaml::Controls::AutoSuggestBoxTextChangedEventArgs const& args);
         void AppsList_ItemClick(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::Controls::ItemClickEventArgs const& e);
@@ -33,6 +37,9 @@ namespace winrt::UsefulAIKey::implementation
 
         // The app the user has chosen (pinned to the top). Null until they click one.
         winrt::UsefulAIKey::AppItem m_savedApp{ nullptr };
+
+        // The saved app path handed to us by Load(), used once to restore selection.
+        winrt::hstring m_savedAppPath;
 
         // Loads the start-menu apps (off-thread) then populates the lists.
         winrt::fire_and_forget LoadAppsAsync();

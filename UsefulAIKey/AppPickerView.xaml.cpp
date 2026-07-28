@@ -41,12 +41,13 @@ namespace winrt::UsefulAIKey::implementation
         // contents whenever the search text or the pinned app changes.
         m_visibleApps = single_threaded_observable_vector<UsefulAIKey::AppItem>();
         AppsList().ItemsSource(m_visibleApps);
-
-        // Kick off the (potentially slow) enumeration without blocking the window.
-        LoadAppsAsync();
 	}
 
-    // Apps list stuff
+    void AppPickerView::Load(hstring const& savedAppPath)
+    {
+        m_savedAppPath = savedAppPath;
+        LoadAppsAsync();
+    }
 
     fire_and_forget AppPickerView::LoadAppsAsync()
     {
@@ -74,23 +75,19 @@ namespace winrt::UsefulAIKey::implementation
 
         RefreshVisibleApps();
 
-        // select saved option
-        UsefulAIKey::SavedSelection saved = co_await m_datastorage.LoadSelectedOptionAsync();
-        if (saved.Kind == UsefulAIKey::ActionKind::LaunchApp && !saved.Command.empty())
+        if (!m_savedAppPath.empty())
         {
-            // Find the saved app among the ones we enumerated.
             UsefulAIKey::AppItem match{ nullptr };
             for (auto const& app : m_allApps)
             {
-                if (app.Path() == saved.Command) { match = app; break; }
+                if (app.Path() == m_savedAppPath) { match = app; break; }
             }
 
-            // Not in the Start Menu (a custom-added app): recreate its row from the
-            // saved path, deriving a display name from the filename.
+            // If an app isn't in the Start Menu, and we added it as custom, we have to add it to m_allApps
             if (!match)
             {
-                std::filesystem::path p{ std::wstring{ saved.Command } };
-                match = make<implementation::AppItem>(hstring{ p.stem().wstring() }, saved.Command);
+                std::filesystem::path p{ std::wstring{ m_savedAppPath } };
+                match = make<implementation::AppItem>(hstring{ p.stem().wstring() }, m_savedAppPath);
                 m_allApps.push_back(match);
                 get_self<implementation::AppItem>(match)->LoadIconAsync();
             }
@@ -176,8 +173,6 @@ namespace winrt::UsefulAIKey::implementation
         // the picking was cancelled
         if (!result) co_return;
 
-        // Copy the path into our own wstring. result.Path() returns a temporary
-        // hstring, so holding its raw c_str() pointer would dangle immediately.
         std::wstring path{ result.Path() };
         AppEntry entry = { .name = path, .path = path };
         AddAppToList(entry);
@@ -220,8 +215,6 @@ namespace winrt::UsefulAIKey::implementation
         get_self<implementation::AppItem>(item)->LoadIconAsync();
     }
 
-    // Highlights an app in the list (deselect the old, select the new, float to top).
-    // Pure UI, no persistence -- so startup-restore can reuse it without re-saving.
     void AppPickerView::HighlightApp(UsefulAIKey::AppItem const& item)
     {
         if (!item) return;

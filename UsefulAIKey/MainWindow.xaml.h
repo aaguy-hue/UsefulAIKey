@@ -29,6 +29,10 @@ namespace winrt::UsefulAIKey::implementation
         winrt::UsefulAIKey::AppPickerView m_appPickerView{ nullptr };
 
         DataStorage m_dataStorage;
+
+        // Saved app path read once at startup and handed to the AppPickerView so it
+        // doesn't have to read the settings file again.
+        winrt::hstring m_savedAppPath;
     };
 }
 

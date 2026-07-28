@@ -41,19 +41,10 @@ namespace winrt::UsefulAIKey::implementation
 
         UsefulAIKey::SavedSelection saved = co_await m_dataStorage.LoadSelectedOptionAsync();
 
+        if (saved.Kind == UsefulAIKey::ActionKind::LaunchApp)
+            m_savedAppPath = saved.Command;
+
         ActionComboBox().SelectedIndex(static_cast<int>(saved.Kind));
-        //switch (saved.Kind)
-        //{
-        //case UsefulAIKey::ActionKind::LaunchApp:
-        //    ActionComboBox().SelectedIndex(0);
-        //    break;
-        //case UsefulAIKey::ActionKind::LaunchWebsite:
-        //    ActionComboBox().SelectedIndex(1);
-        //    break;
-        //case UsefulAIKey::ActionKind::OpenFile:
-        //    ActionComboBox().SelectedIndex(2);
-        //    break;
-        //}
     }
 
     void MainWindow::Action_SelectionChanged(
@@ -82,9 +73,11 @@ namespace winrt::UsefulAIKey::implementation
 
     void MainWindow::ShowLaunchAppView()
     {
-        OutputDebugStringW(L"Selected: LaunchApp\n");
-
-        if (!m_appPickerView) m_appPickerView = winrt::UsefulAIKey::AppPickerView();
+        if (!m_appPickerView)
+        {
+            m_appPickerView = winrt::UsefulAIKey::AppPickerView();
+            m_appPickerView.Load(m_savedAppPath);
+        }
 		UserSelectionStuff().Content(m_appPickerView);
     }
 }
