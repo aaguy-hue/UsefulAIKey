@@ -160,6 +160,7 @@
       <SubType>Code</SubType>
     </ClInclude>
     <ClInclude Include="WindowsApps.h" />
+    <ClInclude Include="WinRTUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml" />
@@ -201,6 +202,7 @@
       <SubType>Code</SubType>
     </ClCompile>
     <ClCompile Include="WindowsApps.cpp" />
+    <ClCompile Include="WinRTUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Midl Include="ActionOption.idl">

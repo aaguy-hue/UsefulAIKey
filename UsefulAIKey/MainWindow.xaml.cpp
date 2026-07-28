@@ -78,8 +78,8 @@ namespace winrt::UsefulAIKey::implementation
             m_appPickerView = winrt::UsefulAIKey::AppPickerView();
             m_appPickerView.Load(m_savedAppPath);
         }
-        this->AppWindow().Resize(Windows::Graphics::SizeInt32{ 632, 712 });
 		UserSelectionStuff().Content(m_appPickerView);
+        this->AppWindow().Resize(Windows::Graphics::SizeInt32{ 632, 712 });
     }
 
     void MainWindow::ShowLaunchWebsiteView()
@@ -88,8 +88,8 @@ namespace winrt::UsefulAIKey::implementation
         {
             m_websiteLaunchView = winrt::UsefulAIKey::WebsiteLaunchView();
         }
-        this->AppWindow().Resize(Windows::Graphics::SizeInt32{ 632, 290 });
 		UserSelectionStuff().Content(m_websiteLaunchView);
+        this->AppWindow().Resize(Windows::Graphics::SizeInt32{ 632, 290 });
     }
 
     void MainWindow::ShowOpenFileView()
@@ -98,8 +98,8 @@ namespace winrt::UsefulAIKey::implementation
         {
             m_fileOpenView = winrt::UsefulAIKey::FileOpenView();
         }
-        this->AppWindow().Resize(Windows::Graphics::SizeInt32{ 632, 290 });
         UserSelectionStuff().Content(m_fileOpenView);
+        this->AppWindow().Resize(Windows::Graphics::SizeInt32{ 632, 290 });
     }
 }
 
