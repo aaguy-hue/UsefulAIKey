@@ -13,6 +13,7 @@ namespace winrt::UsefulAIKey::implementation
         }
 
         void OpenFileMenu_Click(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::RoutedEventArgs const& e);
+        winrt::fire_and_forget OpenFilePicker(winrt::Microsoft::UI::WindowId windowId);
     };
 }
 
