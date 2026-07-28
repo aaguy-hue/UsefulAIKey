@@ -16,7 +16,6 @@ namespace winrt::UsefulAIKey::implementation
         void Action_SelectionChanged(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::Controls::SelectionChangedEventArgs const& e);
         void InitializeComponent();
 
-        void ShowLaunchAppView();
 
     private:
         // Reads the saved action kind (async) and points the ComboBox at it.
@@ -27,12 +26,15 @@ namespace winrt::UsefulAIKey::implementation
         winrt::Windows::Foundation::Collections::IObservableVector<winrt::UsefulAIKey::ActionOption> m_options{ nullptr };
 
         winrt::UsefulAIKey::AppPickerView m_appPickerView{ nullptr };
+        winrt::UsefulAIKey::WebsiteLaunchView m_websiteLaunchView{ nullptr };
 
         DataStorage m_dataStorage;
 
-        // Saved app path read once at startup and handed to the AppPickerView so it
-        // doesn't have to read the settings file again.
         winrt::hstring m_savedAppPath;
+
+        void ShowLaunchAppView();
+        void ShowLaunchWebsiteView();
+        void ShowOpenFileView();
     };
 }
 

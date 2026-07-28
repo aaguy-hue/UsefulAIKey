@@ -15,6 +15,6 @@ namespace winrt::UsefulAIKey::implementation
     void WebsiteLaunchView::Load(hstring const& savedWebsite)
     {
         m_savedWebsite = savedWebsite;
-        PopulateWebsiteField();
+        //PopulateWebsiteField();
     }
 }

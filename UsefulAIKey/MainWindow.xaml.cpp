@@ -63,7 +63,7 @@ namespace winrt::UsefulAIKey::implementation
             ShowLaunchAppView();
             break;
         case UsefulAIKey::ActionKind::LaunchWebsite:
-            OutputDebugStringW(L"Selected: LaunchWebsite\n");
+            ShowLaunchWebsiteView();
             break;
         case UsefulAIKey::ActionKind::OpenFile:
             OutputDebugStringW(L"Selected: OpenFile\n");
@@ -79,6 +79,15 @@ namespace winrt::UsefulAIKey::implementation
             m_appPickerView.Load(m_savedAppPath);
         }
 		UserSelectionStuff().Content(m_appPickerView);
+    }
+
+    void MainWindow::ShowLaunchWebsiteView()
+    {
+        if (!m_websiteLaunchView)
+        {
+            m_websiteLaunchView = winrt::UsefulAIKey::WebsiteLaunchView();
+        }
+		UserSelectionStuff().Content(m_websiteLaunchView);
     }
 }
 

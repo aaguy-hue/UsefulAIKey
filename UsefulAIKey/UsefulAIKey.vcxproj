@@ -151,6 +151,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </ClInclude>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="WebsiteLaunchView.xaml.h">
+      <DependentUpon>WebsiteLaunchView.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClInclude>
     <ClInclude Include="WindowsApps.h" />
   </ItemGroup>
   <ItemGroup>
@@ -159,6 +163,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="MainWindow.xaml" />
+    <Page Include="WebsiteLaunchView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AppPickerView.xaml.cpp">
@@ -178,6 +185,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </ClCompile>
     <ClCompile Include="$(GeneratedFilesDir)module.g.cpp" />
+    <ClCompile Include="WebsiteLaunchView.xaml.cpp">
+      <DependentUpon>WebsiteLaunchView.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClCompile>
     <ClCompile Include="WindowsApps.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -197,6 +208,10 @@
     <Midl Include="MainWindow.idl">
       <SubType>Code</SubType>
       <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Midl>
+    <Midl Include="WebsiteLaunchView.idl">
+      <DependentUpon>WebsiteLaunchView.xaml</DependentUpon>
+      <SubType>Code</SubType>
     </Midl>
   </ItemGroup>
   <ItemGroup>
