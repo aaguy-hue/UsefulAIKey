@@ -14,6 +14,8 @@ namespace winrt::UsefulAIKey::implementation
 
         void Load(hstring const& savedWebsite);
 
+        void SaveWebsite_Click(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::RoutedEventArgs const& e);
+
     private:
         hstring m_savedWebsite;
     };

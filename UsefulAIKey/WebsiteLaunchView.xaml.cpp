@@ -17,4 +17,11 @@ namespace winrt::UsefulAIKey::implementation
         m_savedWebsite = savedWebsite;
         //PopulateWebsiteField();
     }
+
+    void WebsiteLaunchView::SaveWebsite_Click(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::RoutedEventArgs const& e)
+    {
+        // todo: validate that it's an actual valid url
+		OutputDebugStringW((L"Saving website: " + WebsiteUrlTextBox().Text() + L"\n").c_str());
+    }
 }
+

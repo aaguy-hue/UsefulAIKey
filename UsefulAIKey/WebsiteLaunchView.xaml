@@ -10,6 +10,11 @@
 
     <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Spacing="8">
         <TextBlock Text="Enter the URL of the website you want to launch:" />
-        <TextBox x:Name="WebsiteUrlTextBox" Width="400" PlaceholderText="https://example.com" />
+
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBox x:Name="WebsiteUrlTextBox" Width="340" PlaceholderText="https://example.com" />
+            <Button Content="Save!" Click="SaveWebsite_Click" 
+                    Width="60" Style="{StaticResource AccentButtonStyle}" />
+        </StackPanel>
     </StackPanel>
 </UserControl>
