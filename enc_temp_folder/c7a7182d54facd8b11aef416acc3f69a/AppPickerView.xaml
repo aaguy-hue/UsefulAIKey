@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="UsefulAIKey.AppPickerView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:UsefulAIKey"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Spacing="8">
+        
+        <!-- Search box: filters the list below as you type. -->
+        <StackPanel Orientation="Horizontal">
+            <AutoSuggestBox x:Name="SearchBox"
+                        Width="325"
+                        PlaceholderText="Search apps..."
+                        QueryIcon="Find"
+                        TextChanged="SearchBox_TextChanged" />
+            <Button Style="{StaticResource AccentButtonStyle}"
+                    Width="125"
+                    Content="Browse for app..." 
+                    Click="BrowseForApp_Click"
+                />
+        </StackPanel>
+
+        <!-- The app list. IsItemClickEnabled makes each row a button (raises
+             ItemClick); we handle that to select the chosen app and float it to
+             the top. -->
+        <ListView x:Name="AppsList"
+                  Width="450" Height="360"
+                  SelectionMode="None"
+                  IsItemClickEnabled="True"
+                  ItemClick="AppsList_ItemClick">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="local:AppItem">
+                    <Grid MinHeight="40">
+                        <!-- Selected-state highlight: a soft accent-tinted fill behind
+                             the row (the accent brush at low opacity), shown only for
+                             the chosen app. -->
+                        <Border Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                Opacity="0.15"
+                                CornerRadius="6"
+                                Visibility="{x:Bind SelectionIndicatorVisibility, Mode=OneWay}"/>
+
+                        <!-- Accent bar down the left edge of the selected row. -->
+                        <Border Width="3" CornerRadius="1.5" Margin="0,6"
+                                HorizontalAlignment="Left"
+                                Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                Visibility="{x:Bind SelectionIndicatorVisibility, Mode=OneWay}"/>
+
+                        <Grid ColumnSpacing="12" Padding="14,6,10,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Logo binds OneWay because it loads asynchronously. -->
+                            <Image Grid.Column="0" Width="24" Height="24"
+                                   Source="{x:Bind Logo, Mode=OneWay}"/>
+
+                            <TextBlock Grid.Column="1"
+                                       Text="{x:Bind Name}"
+                                       FontWeight="{x:Bind NameFontWeight, Mode=OneWay}"
+                                       VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"/>
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+     
+    </StackPanel>
+
+</UserControl>
