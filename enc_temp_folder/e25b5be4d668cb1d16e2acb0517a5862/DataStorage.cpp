@@ -49,6 +49,7 @@ IAsyncOperation<SavingError> DataStorage::WriteJsonAsync(JsonObject root)
 		StorageFile file = co_await localFolder.CreateFileAsync(
 			hstring{ STORAGE_FILE_NAME }, CreationCollisionOption::OpenIfExists);
 		co_await FileIO::WriteTextAsync(file, json);
+
 		OutputDebugStringW((L"Saved settings file at path: " + file.Path() + L"\n").c_str());
 	}
 	catch (hresult_error const&)
@@ -67,7 +68,8 @@ IAsyncOperation<SavingError> DataStorage::SaveSelectedAppToFileAsync(UsefulAIKey
 	if (loadResult != SavingError::None)
 		co_return loadResult; // ReadError or ParseError
 
-	root.SetNamedValue(L"launchCommand", JsonValue::CreateStringValue(item.Path()));
+	root.SetNamedValue(L"selectedAppPath", JsonValue::CreateStringValue(item.Path()));
+	root.SetNamedValue(L"selectedAppName", JsonValue::CreateStringValue(item.Name()));
 
 	co_return co_await WriteJsonAsync(root);
 }

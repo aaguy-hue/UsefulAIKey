@@ -25,6 +25,6 @@ private:
 	winrt::Windows::Foundation::IAsyncOperation<winrt::UsefulAIKey::SavingError>
 		WriteJsonAsync(winrt::Windows::Data::Json::JsonObject root);
 
-	static inline constexpr std::wstring_view STORAGE_FILE_NAME = L"dataFile.json";
+	static inline constexpr std::wstring_view STORAGE_FILE_NAME = L"dataFile.txt";
 	static inline constexpr uint32_t JSON_FILE_MAX_CAPACITY = 5 * 1024; // 5 KB
 };
