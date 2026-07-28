@@ -55,9 +55,6 @@ namespace winrt::UsefulAIKey::implementation
         // Pure-UI selection (no persistence); reused by startup restore.
         void HighlightApp(UsefulAIKey::AppItem const& item);
         
-        winrt::fire_and_forget ShowDialogMessage(hstring title, hstring content,
-            hstring primaryButtonText = L"OK", hstring secondaryButtonText = L"", hstring closeButtonText = L"");
-
         // Rebuilds m_visibleApps from m_allApps using the current search text,
         // placing the pinned app first.
         void RefreshVisibleApps();

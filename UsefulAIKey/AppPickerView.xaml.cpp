@@ -4,6 +4,7 @@
 #include "AppItem.h"
 #include "DataStorage.h"
 #include "WindowsApps.h"
+#include "WinRTUtil.h"
 
 #include <filesystem>
 
@@ -178,21 +179,6 @@ namespace winrt::UsefulAIKey::implementation
         AddAppToList(entry);
     }
 
-    winrt::fire_and_forget AppPickerView::ShowDialogMessage(hstring title, hstring content,
-        hstring primaryButtonText, hstring secondaryButtonText, hstring closeButtonText)
-    {
-        auto lifetime = this->get_strong();
-        using namespace winrt::Microsoft::UI::Xaml::Controls;
-        ContentDialog dialog;
-        dialog.XamlRoot(this->XamlRoot());
-        dialog.Title(box_value(title));
-        dialog.Content(box_value(content));
-        dialog.PrimaryButtonText(primaryButtonText);
-        dialog.SecondaryButtonText(secondaryButtonText);
-        dialog.CloseButtonText(closeButtonText);
-		co_await dialog.ShowAsync();
-    }
-
     winrt::fire_and_forget AppPickerView::AddAppToList(AppEntry entry)
     {
         auto lifetime = get_strong();
@@ -201,7 +187,7 @@ namespace winrt::UsefulAIKey::implementation
         {
             if (app.Path() == entry.path)
             {
-				ShowDialogMessage(L"Warning", L"This app is already in the list", L"OK");
+				ShowDialogMessage(this->XamlRoot(), L"Warning", L"This app is already in the list", L"OK");
                 SelectApp(app);
                 co_return;
             }
@@ -241,16 +227,16 @@ namespace winrt::UsefulAIKey::implementation
         case UsefulAIKey::SavingError::None:
             break;
         case UsefulAIKey::SavingError::ReadError:
-            ShowDialogMessage(L"Error", L"Couldn't read the saved settings file.", L"OK");
+            ShowDialogMessage(this->XamlRoot(), L"Error", L"Couldn't read the saved settings file.", L"OK");
             break;
         case UsefulAIKey::SavingError::ParseError:
-            ShowDialogMessage(L"Error", L"The saved settings file is corrupted.", L"OK");
+            ShowDialogMessage(this->XamlRoot(), L"Error", L"The saved settings file is corrupted.", L"OK");
             break;
         case UsefulAIKey::SavingError::CapacityExceeded:
-            ShowDialogMessage(L"Error", L"Settings data exceeds the maximum capacity.", L"OK");
+            ShowDialogMessage(this->XamlRoot(), L"Error", L"Settings data exceeds the maximum capacity.", L"OK");
             break;
         case UsefulAIKey::SavingError::WriteError:
-            ShowDialogMessage(L"Error", L"Couldn't save the settings file.", L"OK");
+            ShowDialogMessage(this->XamlRoot(), L"Error", L"Couldn't save the settings file.", L"OK");
             break;
         }
     }
