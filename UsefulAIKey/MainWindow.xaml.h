@@ -1,5 +1,6 @@
 #pragma once
 
+#include "DataStorage.h"
 #include "MainWindow.g.h"
 
 namespace winrt::UsefulAIKey::implementation
@@ -23,6 +24,8 @@ namespace winrt::UsefulAIKey::implementation
         winrt::Windows::Foundation::Collections::IObservableVector<winrt::UsefulAIKey::ActionOption> m_options{ nullptr };
 
         winrt::UsefulAIKey::AppPickerView m_appPickerView{ nullptr };
+
+        DataStorage m_dataStorage;
     };
 }
 

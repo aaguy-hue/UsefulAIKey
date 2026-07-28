@@ -1,6 +1,9 @@
 #pragma once
 #include "AppItem.h"
+#include "ActionOption.h"
 #include <winrt/UsefulAIKey.h>
+#include <utility>
+#include <variant>
 
 class DataStorage
 {
@@ -10,6 +13,10 @@ public:
 	// can't crash the app.
 	winrt::Windows::Foundation::IAsyncOperation<winrt::UsefulAIKey::SavingError>
 		SaveSelectedAppToFileAsync(winrt::UsefulAIKey::AppItem item);
+
+	winrt::Windows::Foundation::IAsyncOperation<
+		std::pair<winrt::UsefulAIKey::ActionKind, std::variant<winrt::UsefulAIKey::AppItem, winrt::hstring>>
+	> LoadSelectedOption();
 
 private:
 	// Reusable building blocks -- any future load/save path (the app list, reading

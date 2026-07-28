@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "MainWindow.xaml.h"
 #include "ActionOption.h"
+#include "DataStorage.h"
 #if __has_include("MainWindow.g.cpp")
 #include "MainWindow.g.cpp"
 #endif
@@ -30,7 +31,22 @@ namespace winrt::UsefulAIKey::implementation
         m_options.Append(make<ActionOption>(ActionKind::OpenFile, L"Open a file"));
 
         ActionComboBox().ItemsSource(m_options);
-        ActionComboBox().SelectedIndex(0);
+        //ActionComboBox().SelectedIndex(0);
+
+        std::pair<ActionKind, std::variant<winrt::UsefulAIKey::AppItem, hstring>> data = m_dataStorage.LoadSelectedOption();
+        //ActionComboBox().SelectedIndex(static_cast<int>(data.first));
+        switch (data.first)
+        {
+        case ActionKind::LaunchApp:
+            ActionComboBox().SelectedIndex(0);
+            break;
+        case ActionKind::LaunchWebsite:
+            ActionComboBox().SelectedIndex(1);
+            break;
+        case ActionKind::OpenFile:
+            ActionComboBox().SelectedIndex(2);
+            break;
+        }
     }
 
     void MainWindow::Action_SelectionChanged(

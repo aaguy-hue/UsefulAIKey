@@ -1,10 +1,16 @@
 #include "pch.h"
+#include "AppItem.h"
+#include "ActionOption.h"
 #include "DataStorage.h"
+
+#include <variant>
+#include <utility>
 
 using namespace winrt;
 using namespace winrt::Windows::Foundation;
 using namespace winrt::Windows::Storage;
 using namespace winrt::Windows::Data::Json;
+using namespace UsefulAIKey;
 
 using SavingError = winrt::UsefulAIKey::SavingError;
 
@@ -67,7 +73,49 @@ IAsyncOperation<SavingError> DataStorage::SaveSelectedAppToFileAsync(UsefulAIKey
 	if (loadResult != SavingError::None)
 		co_return loadResult; // ReadError or ParseError
 
+	root.SetNamedValue(L"actionType", JsonValue::CreateStringValue(L"app"));
 	root.SetNamedValue(L"launchCommand", JsonValue::CreateStringValue(item.Path()));
 
 	co_return co_await WriteJsonAsync(root);
+}
+
+IAsyncOperation<std::pair<ActionKind, std::variant<AppItem, hstring>>> DataStorage::LoadSelectedOption()
+{
+	JsonObject root{ nullptr };
+	
+	SavingError loadResult = co_await LoadJsonAsync(root);
+	if (loadResult != SavingError::None)
+		co_return std::pair<ActionKind, std::variant<AppItem, hstring>>(
+			ActionKind::LaunchApp, AppItem{ L"", L"" }
+		);
+
+	winrt::hstring actionType = root.GetNamedString(L"actionType");
+	ActionKind kind;
+	if (actionType == L"app")
+	{
+		winrt::hstring launchCommand = root.GetNamedString(L"launchCommand");
+		co_return std::pair<ActionKind, std::variant<AppItem, hstring>>(
+			ActionKind::LaunchApp, AppItem{ L"", launchCommand }
+		);
+	}
+	else if (actionType == L"website")
+	{
+		winrt::hstring url = root.GetNamedString(L"url");
+		co_return std::pair<ActionKind, std::variant<AppItem, hstring>>(
+			ActionKind::LaunchWebsite, url
+		);
+	}
+	else if (actionType == L"file")
+	{
+		winrt::hstring filePath = root.GetNamedString(L"filePath");
+		co_return std::pair<ActionKind, std::variant<AppItem, hstring>>(
+			ActionKind::OpenFile, filePath
+		);
+	}
+	else
+	{
+		co_return std::pair<ActionKind, std::variant<AppItem, hstring>>(
+			ActionKind::LaunchApp, AppItem{ L"", L"" }
+		);
+	}	
 }
