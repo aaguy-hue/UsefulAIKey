@@ -1,5 +1,6 @@
 #pragma once
 
+#include "DataStorage.h"
 #include "WindowsApps.h"
 #include "AppPickerView.g.h"
 
@@ -21,6 +22,8 @@ namespace winrt::UsefulAIKey::implementation
         void BrowseForApp_Click(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::RoutedEventArgs const& e);
 
     private:
+        DataStorage m_datastorage;
+
         // Every app we found, sorted by name (the master list).
         std::vector<winrt::UsefulAIKey::AppItem> m_allApps;
 
@@ -40,7 +43,10 @@ namespace winrt::UsefulAIKey::implementation
         winrt::fire_and_forget OpenFilePicker(winrt::Microsoft::UI::WindowId windowId);
 
         winrt::fire_and_forget AddAppToList(AppEntry entry);
-        void SelectApp(UsefulAIKey::AppItem const& item);
+        winrt::fire_and_forget SelectApp(UsefulAIKey::AppItem item);
+        
+        winrt::fire_and_forget ShowDialogMessage(hstring title, hstring content,
+            hstring primaryButtonText = L"OK", hstring secondaryButtonText = L"", hstring closeButtonText = L"");
 
         // Rebuilds m_visibleApps from m_allApps using the current search text,
         // placing the pinned app first.

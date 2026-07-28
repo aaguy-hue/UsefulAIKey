@@ -140,6 +140,7 @@
       <DependentUpon>AppPickerView.xaml</DependentUpon>
       <SubType>Code</SubType>
     </ClInclude>
+    <ClInclude Include="DataStorage.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="ActionOption.h" />
     <ClInclude Include="AppItem.h" />
@@ -164,6 +165,7 @@
       <DependentUpon>AppPickerView.xaml</DependentUpon>
       <SubType>Code</SubType>
     </ClCompile>
+    <ClCompile Include="DataStorage.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -183,6 +185,9 @@
       <SubType>Code</SubType>
     </Midl>
     <Midl Include="AppItem.idl">
+      <SubType>Code</SubType>
+    </Midl>
+    <Midl Include="DataStorage.idl">
       <SubType>Code</SubType>
     </Midl>
     <Midl Include="AppPickerView.idl">

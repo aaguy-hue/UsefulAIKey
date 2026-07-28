@@ -2,6 +2,7 @@
 #include "AppPickerView.xaml.h"
 
 #include "AppItem.h"
+#include "DataStorage.h"
 #include "WindowsApps.h"
 
 #if __has_include("AppPickerView.g.cpp")
@@ -156,6 +157,21 @@ namespace winrt::UsefulAIKey::implementation
         AddAppToList(entry);
     }
 
+    winrt::fire_and_forget AppPickerView::ShowDialogMessage(hstring title, hstring content,
+        hstring primaryButtonText, hstring secondaryButtonText, hstring closeButtonText)
+    {
+        auto lifetime = this->get_strong();
+        using namespace winrt::Microsoft::UI::Xaml::Controls;
+        ContentDialog dialog;
+        dialog.XamlRoot(this->XamlRoot());
+        dialog.Title(box_value(title));
+        dialog.Content(box_value(content));
+        dialog.PrimaryButtonText(primaryButtonText);
+        dialog.SecondaryButtonText(secondaryButtonText);
+        dialog.CloseButtonText(closeButtonText);
+		co_await dialog.ShowAsync();
+    }
+
     winrt::fire_and_forget AppPickerView::AddAppToList(AppEntry entry)
     {
         auto lifetime = get_strong();
@@ -164,16 +180,7 @@ namespace winrt::UsefulAIKey::implementation
         {
             if (app.Path() == entry.path)
             {
-                using namespace winrt::Microsoft::UI::Xaml::Controls;
-                ContentDialog dialog;
-                // winrt::box_value boxes C++ scalar values into IInspectable objects
-                dialog.XamlRoot(this->XamlRoot());
-                dialog.Title(box_value(L"Warning"));
-                dialog.Content(box_value(L"This app is already in the list"));
-                dialog.PrimaryButtonText(L"OK");
-                co_await dialog.ShowAsync();
-
-				// Select the existing app in the list
+				ShowDialogMessage(L"Warning", L"This app is already in the list", L"OK");
                 SelectApp(app);
                 co_return;
             }
@@ -187,15 +194,37 @@ namespace winrt::UsefulAIKey::implementation
         get_self<implementation::AppItem>(item)->LoadIconAsync();
     }
 
-    void AppPickerView::SelectApp(UsefulAIKey::AppItem const& item)
+    winrt::fire_and_forget AppPickerView::SelectApp(UsefulAIKey::AppItem item)
     {
-        if (!item) return;
+        // Keep 'this' alive across the co_await below (we touch members after it).
+        auto lifetime = get_strong();
+
+        if (!item) co_return;
 
         if (m_savedApp && m_savedApp != item) m_savedApp.IsSelected(false);
         item.IsSelected(true);
 
         m_savedApp = item;
         RefreshVisibleApps();
+
+        UsefulAIKey::SavingError err = co_await m_datastorage.SaveSelectedAppToFileAsync(item);
+        switch (err)
+        {
+        case UsefulAIKey::SavingError::None:
+            break;
+        case UsefulAIKey::SavingError::ReadError:
+            ShowDialogMessage(L"Error", L"Couldn't read the saved settings file.", L"OK");
+            break;
+        case UsefulAIKey::SavingError::ParseError:
+            ShowDialogMessage(L"Error", L"The saved settings file is corrupted.", L"OK");
+            break;
+        case UsefulAIKey::SavingError::CapacityExceeded:
+            ShowDialogMessage(L"Error", L"Settings data exceeds the maximum capacity.", L"OK");
+            break;
+        case UsefulAIKey::SavingError::WriteError:
+            ShowDialogMessage(L"Error", L"Couldn't save the settings file.", L"OK");
+            break;
+        }
     }
 
 }

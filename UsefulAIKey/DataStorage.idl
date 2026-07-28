@@ -1,0 +1,14 @@
+namespace UsefulAIKey
+{
+    // Result of trying to save settings
+    // It's declared here in IDL instead of an enum so it becomes a WinRT type
+    // For IAsyncOperation<T>
+    enum SavingError
+    {
+        None,             // saved successfully
+        ReadError,        // couldn't read the existing settings file
+        ParseError,       // couldn't parse the existing settings file
+        CapacityExceeded, // the new document would exceed the size cap
+        WriteError,       // couldn't write the file back to disk
+    };
+}
