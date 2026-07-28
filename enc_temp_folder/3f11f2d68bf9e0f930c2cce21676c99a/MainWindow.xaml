@@ -10,10 +10,10 @@
     Title="UsefulAIKey">
 
     <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="16" Spacing="8">
-        <TextBlock HorizontalAlignment="Center">Your Copilot key will...</TextBlock>
         <ComboBox x:Name="ActionComboBox"
                   SelectionChanged="Action_SelectionChanged"
-                  Width="200" HorizontalAlignment="Center">
+                  Header="Your Copilot key will..." Width="200"
+                  HorizontalAlignment="Center">
             <ComboBox.ItemTemplate>
                 <DataTemplate x:DataType="local:ActionOption">
                     <TextBlock Text="{x:Bind Label}"/>
