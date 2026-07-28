@@ -66,7 +66,7 @@ namespace winrt::UsefulAIKey::implementation
             ShowLaunchWebsiteView();
             break;
         case UsefulAIKey::ActionKind::OpenFile:
-            OutputDebugStringW(L"Selected: OpenFile\n");
+			ShowOpenFileView();
             break;
         }
     }
@@ -90,6 +90,16 @@ namespace winrt::UsefulAIKey::implementation
         }
         this->AppWindow().Resize(Windows::Graphics::SizeInt32{ 632, 290 });
 		UserSelectionStuff().Content(m_websiteLaunchView);
+    }
+
+    void MainWindow::ShowOpenFileView()
+    {
+        if (!m_fileOpenView)
+        {
+            m_fileOpenView = winrt::UsefulAIKey::FileOpenView();
+        }
+        this->AppWindow().Resize(Windows::Graphics::SizeInt32{ 632, 290 });
+        UserSelectionStuff().Content(m_fileOpenView);
     }
 }
 

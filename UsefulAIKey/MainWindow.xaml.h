@@ -27,6 +27,7 @@ namespace winrt::UsefulAIKey::implementation
 
         winrt::UsefulAIKey::AppPickerView m_appPickerView{ nullptr };
         winrt::UsefulAIKey::WebsiteLaunchView m_websiteLaunchView{ nullptr };
+		winrt::UsefulAIKey::FileOpenView m_fileOpenView{ nullptr };
 
         DataStorage m_dataStorage;
 

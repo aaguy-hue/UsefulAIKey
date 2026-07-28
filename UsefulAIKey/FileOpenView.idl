@@ -1,0 +1,8 @@
+namespace UsefulAIKey
+{
+    [default_interface]
+    runtimeclass FileOpenView : Microsoft.UI.Xaml.Controls.UserControl
+    {
+        FileOpenView();
+    }
+}
