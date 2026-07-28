@@ -2,8 +2,6 @@
 #include "AppItem.h"
 #include "ActionOption.h"
 #include <winrt/UsefulAIKey.h>
-#include <utility>
-#include <variant>
 
 class DataStorage
 {
@@ -14,9 +12,11 @@ public:
 	winrt::Windows::Foundation::IAsyncOperation<winrt::UsefulAIKey::SavingError>
 		SaveSelectedAppToFileAsync(winrt::UsefulAIKey::AppItem item);
 
-	winrt::Windows::Foundation::IAsyncOperation<
-		std::pair<winrt::UsefulAIKey::ActionKind, std::variant<winrt::UsefulAIKey::AppItem, winrt::hstring>>
-	> LoadSelectedOption();
+	// Reads the saved choice back at startup. Returns a SavedSelection (a WinRT
+	// struct, so it can ride inside IAsyncOperation). Command is empty when there's
+	// nothing saved / the file couldn't be read -- the caller just checks for that.
+	winrt::Windows::Foundation::IAsyncOperation<winrt::UsefulAIKey::SavedSelection>
+		LoadSelectedOptionAsync();
 
 private:
 	// Reusable building blocks -- any future load/save path (the app list, reading

@@ -5,6 +5,8 @@
 #include "DataStorage.h"
 #include "WindowsApps.h"
 
+#include <filesystem>
+
 #if __has_include("AppPickerView.g.cpp")
 #include "AppPickerView.g.cpp"
 #endif
@@ -71,6 +73,30 @@ namespace winrt::UsefulAIKey::implementation
         }
 
         RefreshVisibleApps();
+
+        // select saved option
+        UsefulAIKey::SavedSelection saved = co_await m_datastorage.LoadSelectedOptionAsync();
+        if (saved.Kind == UsefulAIKey::ActionKind::LaunchApp && !saved.Command.empty())
+        {
+            // Find the saved app among the ones we enumerated.
+            UsefulAIKey::AppItem match{ nullptr };
+            for (auto const& app : m_allApps)
+            {
+                if (app.Path() == saved.Command) { match = app; break; }
+            }
+
+            // Not in the Start Menu (a custom-added app): recreate its row from the
+            // saved path, deriving a display name from the filename.
+            if (!match)
+            {
+                std::filesystem::path p{ std::wstring{ saved.Command } };
+                match = make<implementation::AppItem>(hstring{ p.stem().wstring() }, saved.Command);
+                m_allApps.push_back(match);
+                get_self<implementation::AppItem>(match)->LoadIconAsync();
+            }
+
+            HighlightApp(match); // select without re-saving
+        }
     }
 
     void AppPickerView::RefreshVisibleApps()
@@ -194,6 +220,19 @@ namespace winrt::UsefulAIKey::implementation
         get_self<implementation::AppItem>(item)->LoadIconAsync();
     }
 
+    // Highlights an app in the list (deselect the old, select the new, float to top).
+    // Pure UI, no persistence -- so startup-restore can reuse it without re-saving.
+    void AppPickerView::HighlightApp(UsefulAIKey::AppItem const& item)
+    {
+        if (!item) return;
+
+        if (m_savedApp && m_savedApp != item) m_savedApp.IsSelected(false);
+        item.IsSelected(true);
+
+        m_savedApp = item;
+        RefreshVisibleApps();
+    }
+
     winrt::fire_and_forget AppPickerView::SelectApp(UsefulAIKey::AppItem item)
     {
         // Keep 'this' alive across the co_await below (we touch members after it).
@@ -201,11 +240,7 @@ namespace winrt::UsefulAIKey::implementation
 
         if (!item) co_return;
 
-        if (m_savedApp && m_savedApp != item) m_savedApp.IsSelected(false);
-        item.IsSelected(true);
-
-        m_savedApp = item;
-        RefreshVisibleApps();
+        HighlightApp(item);
 
         UsefulAIKey::SavingError err = co_await m_datastorage.SaveSelectedAppToFileAsync(item);
         switch (err)

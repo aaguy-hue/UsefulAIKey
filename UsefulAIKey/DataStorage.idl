@@ -1,3 +1,5 @@
+import "ActionOption.idl"; // for ActionKind
+
 namespace UsefulAIKey
 {
     // Result of trying to save settings
@@ -10,5 +12,15 @@ namespace UsefulAIKey
         ParseError,       // couldn't parse the existing settings file
         CapacityExceeded, // the new document would exceed the size cap
         WriteError,       // couldn't write the file back to disk
+    };
+
+    // The persisted "what should the Copilot key do" choice, loaded at startup.
+    // A WinRT struct so it can be the T in IAsyncOperation<T>. Structs may hold
+    // enums and strings (but NOT runtimeclasses like AppItem) -- which is why the
+    // payload is a plain string path/url rather than an AppItem.
+    struct SavedSelection
+    {
+        ActionKind Kind;  // app / website / file
+        String Command;   // the app path, url, or file path ("" when nothing is saved)
     };
 }

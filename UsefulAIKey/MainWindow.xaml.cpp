@@ -31,22 +31,29 @@ namespace winrt::UsefulAIKey::implementation
         m_options.Append(make<ActionOption>(ActionKind::OpenFile, L"Open a file"));
 
         ActionComboBox().ItemsSource(m_options);
-        //ActionComboBox().SelectedIndex(0);
 
-        std::pair<ActionKind, std::variant<winrt::UsefulAIKey::AppItem, hstring>> data = m_dataStorage.LoadSelectedOption();
-        //ActionComboBox().SelectedIndex(static_cast<int>(data.first));
-        switch (data.first)
-        {
-        case ActionKind::LaunchApp:
-            ActionComboBox().SelectedIndex(0);
-            break;
-        case ActionKind::LaunchWebsite:
-            ActionComboBox().SelectedIndex(1);
-            break;
-        case ActionKind::OpenFile:
-            ActionComboBox().SelectedIndex(2);
-            break;
-        }
+        RestoreSelectedActionAsync();
+    }
+
+    winrt::fire_and_forget MainWindow::RestoreSelectedActionAsync()
+    {
+        auto lifetime = get_strong();
+
+        UsefulAIKey::SavedSelection saved = co_await m_dataStorage.LoadSelectedOptionAsync();
+
+        ActionComboBox().SelectedIndex(static_cast<int>(saved.Kind));
+        //switch (saved.Kind)
+        //{
+        //case UsefulAIKey::ActionKind::LaunchApp:
+        //    ActionComboBox().SelectedIndex(0);
+        //    break;
+        //case UsefulAIKey::ActionKind::LaunchWebsite:
+        //    ActionComboBox().SelectedIndex(1);
+        //    break;
+        //case UsefulAIKey::ActionKind::OpenFile:
+        //    ActionComboBox().SelectedIndex(2);
+        //    break;
+        //}
     }
 
     void MainWindow::Action_SelectionChanged(

@@ -3,9 +3,6 @@
 #include "ActionOption.h"
 #include "DataStorage.h"
 
-#include <variant>
-#include <utility>
-
 using namespace winrt;
 using namespace winrt::Windows::Foundation;
 using namespace winrt::Windows::Storage;
@@ -79,43 +76,31 @@ IAsyncOperation<SavingError> DataStorage::SaveSelectedAppToFileAsync(UsefulAIKey
 	co_return co_await WriteJsonAsync(root);
 }
 
-IAsyncOperation<std::pair<ActionKind, std::variant<AppItem, hstring>>> DataStorage::LoadSelectedOption()
+IAsyncOperation<SavedSelection> DataStorage::LoadSelectedOptionAsync()
 {
+	SavedSelection result{};
+
 	JsonObject root{ nullptr };
-	
 	SavingError loadResult = co_await LoadJsonAsync(root);
 	if (loadResult != SavingError::None)
-		co_return std::pair<ActionKind, std::variant<AppItem, hstring>>(
-			ActionKind::LaunchApp, AppItem{ L"", L"" }
-		);
+		co_return result;
 
-	winrt::hstring actionType = root.GetNamedString(L"actionType");
-	ActionKind kind;
+	hstring actionType = root.GetNamedString(L"actionType", L"");
 	if (actionType == L"app")
 	{
-		winrt::hstring launchCommand = root.GetNamedString(L"launchCommand");
-		co_return std::pair<ActionKind, std::variant<AppItem, hstring>>(
-			ActionKind::LaunchApp, AppItem{ L"", launchCommand }
-		);
+		result.Kind = ActionKind::LaunchApp;
+		result.Command = root.GetNamedString(L"launchCommand", L"");
 	}
 	else if (actionType == L"website")
 	{
-		winrt::hstring url = root.GetNamedString(L"url");
-		co_return std::pair<ActionKind, std::variant<AppItem, hstring>>(
-			ActionKind::LaunchWebsite, url
-		);
+		result.Kind = ActionKind::LaunchWebsite;
+		result.Command = root.GetNamedString(L"url", L"");
 	}
 	else if (actionType == L"file")
 	{
-		winrt::hstring filePath = root.GetNamedString(L"filePath");
-		co_return std::pair<ActionKind, std::variant<AppItem, hstring>>(
-			ActionKind::OpenFile, filePath
-		);
+		result.Kind = ActionKind::OpenFile;
+		result.Command = root.GetNamedString(L"filePath", L"");
 	}
-	else
-	{
-		co_return std::pair<ActionKind, std::variant<AppItem, hstring>>(
-			ActionKind::LaunchApp, AppItem{ L"", L"" }
-		);
-	}	
+
+	co_return result;
 }

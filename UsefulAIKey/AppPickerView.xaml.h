@@ -44,6 +44,9 @@ namespace winrt::UsefulAIKey::implementation
 
         winrt::fire_and_forget AddAppToList(AppEntry entry);
         winrt::fire_and_forget SelectApp(UsefulAIKey::AppItem item);
+
+        // Pure-UI selection (no persistence); reused by startup restore.
+        void HighlightApp(UsefulAIKey::AppItem const& item);
         
         winrt::fire_and_forget ShowDialogMessage(hstring title, hstring content,
             hstring primaryButtonText = L"OK", hstring secondaryButtonText = L"", hstring closeButtonText = L"");

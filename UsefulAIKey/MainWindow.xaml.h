@@ -19,6 +19,9 @@ namespace winrt::UsefulAIKey::implementation
         void ShowLaunchAppView();
 
     private:
+        // Reads the saved action kind (async) and points the ComboBox at it.
+        winrt::fire_and_forget RestoreSelectedActionAsync();
+
         // Kept alive as a member so the ComboBox's ItemsSource stays valid for the
         // lifetime of the window.
         winrt::Windows::Foundation::Collections::IObservableVector<winrt::UsefulAIKey::ActionOption> m_options{ nullptr };

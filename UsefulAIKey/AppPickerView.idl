@@ -4,5 +4,9 @@ namespace UsefulAIKey
     runtimeclass AppPickerView : Microsoft.UI.Xaml.Controls.UserControl
     {
         AppPickerView();
+
+        // Starts loading the app list. Pass the previously-saved app path so the
+        // view can re-select it without re-reading the settings file ("" = none).
+        void Load(String savedAppPath);
     }
 }
