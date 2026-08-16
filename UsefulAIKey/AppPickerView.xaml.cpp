@@ -183,6 +183,10 @@ namespace winrt::UsefulAIKey::implementation
 
     winrt::fire_and_forget AppPickerView::OpenFilePicker(winrt::Microsoft::UI::WindowId windowId)
     {
+        // Keep 'this' alive across the awaits below (the file picker and the naming
+        // dialog); we touch members (XamlRoot, AddAppToList) after they resume.
+        auto lifetime = get_strong();
+
         winrt::Microsoft::Windows::Storage::Pickers::FileOpenPicker picker(windowId);
         picker.SuggestedStartLocation(winrt::Microsoft::Windows::Storage::Pickers::PickerLocationId::ComputerFolder);
         picker.CommitButtonText(L"Select App");
@@ -199,9 +203,21 @@ namespace winrt::UsefulAIKey::implementation
         if (!result) co_return;
 
         std::wstring path{ result.Path() };
-
         std::filesystem::path parsed{ path };
-        AppEntry entry = { .name = parsed.stem().wstring(), .path = path };
+
+        // Let the user name the app for the list, pre-filled with the file's stem
+        // (e.g. "notepad"). An empty result means they cancelled -> add nothing.
+        hstring name = co_await ShowInputDialog(
+            this->XamlRoot(),
+            L"Name this app",
+            L"App name",
+            hstring{ parsed.stem().wstring() },
+            L"Add",
+            L"Cancel");
+
+        if (name.empty()) co_return;
+
+        AppEntry entry = { .name = std::wstring{ name }, .path = path };
         AddAppToList(entry);
     }
 

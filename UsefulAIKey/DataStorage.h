@@ -18,6 +18,8 @@ public:
 	// saves if you add a custom app to the list
 	winrt::Windows::Foundation::IAsyncOperation<winrt::UsefulAIKey::SavingError>
 		AddCustomAppAsync(winrt::hstring name, winrt::hstring path);
+	
+	winrt::Windows::Foundation::IAsyncOperation<winrt::UsefulAIKey::SavingError> RemoveCustomAppAsync(winrt::hstring path);
 
 	// loads list of custom apps that you added to the list
 	winrt::Windows::Foundation::IAsyncOperation<

@@ -1,7 +1,4 @@
 #include "pch.h"
-
-#include <ranges>
-
 #include "AppItem.h"
 #include "ActionOption.h"
 #include "DataStorage.h"
@@ -124,19 +121,10 @@ IAsyncOperation<SavingError> DataStorage::AddCustomAppAsync(hstring name, hstrin
 		: JsonArray{};
 
 	// remove duplicates
-	for (uint32_t i = 0; i < customApps.Size(); ++i)
+	for (auto const& value : customApps)
 	{
-		auto const& value = customApps.GetAt(i);
 		if (value.GetObject().GetNamedString(L"path", L"") == path)
-		{
-			if (value.GetObject().GetNamedString(L"name") == name)
-				co_return SavingError::None;
-			else
-			{
-				customApps.RemoveAt(i);
-				break;
-			}
-		}
+			co_return SavingError::None;
 	}
 
 	JsonObject entry;
