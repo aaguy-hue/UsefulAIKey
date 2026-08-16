@@ -2,21 +2,27 @@
 #include "AppItem.h"
 #include "ActionOption.h"
 #include <winrt/UsefulAIKey.h>
+#include <winrt/Windows.Foundation.Collections.h>
 
 class DataStorage
 {
 public:
-	// Reads the settings file fresh, records the selected app, and writes it back.
-	// Returns a SavingError describing the outcome. Never throws, so a bad save
-	// can't crash the app.
+	// loads the selected option at start (app/website/file)
+	winrt::Windows::Foundation::IAsyncOperation<winrt::UsefulAIKey::SavedSelection>
+		LoadSelectedOptionAsync();
+
+	// if you selected an app, save it to a file
 	winrt::Windows::Foundation::IAsyncOperation<winrt::UsefulAIKey::SavingError>
 		SaveSelectedAppToFileAsync(winrt::UsefulAIKey::AppItem item);
 
-	// Reads the saved choice back at startup. Returns a SavedSelection (a WinRT
-	// struct, so it can ride inside IAsyncOperation). Command is empty when there's
-	// nothing saved / the file couldn't be read -- the caller just checks for that.
-	winrt::Windows::Foundation::IAsyncOperation<winrt::UsefulAIKey::SavedSelection>
-		LoadSelectedOptionAsync();
+	// saves if you add a custom app to the list
+	winrt::Windows::Foundation::IAsyncOperation<winrt::UsefulAIKey::SavingError>
+		AddCustomAppAsync(winrt::hstring name, winrt::hstring path);
+
+	// loads list of custom apps that you added to the list
+	winrt::Windows::Foundation::IAsyncOperation<
+		winrt::Windows::Foundation::Collections::IVector<winrt::UsefulAIKey::CustomApp>>
+		LoadCustomAppsAsync();
 
 private:
 	// Reusable building blocks -- any future load/save path (the app list, reading

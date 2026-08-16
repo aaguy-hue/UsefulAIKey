@@ -4,6 +4,9 @@
 #include "WindowsApps.h"
 #include "AppPickerView.g.h"
 
+using namespace winrt::Windows::Foundation;
+using namespace winrt::Microsoft::UI::Xaml;
+
 namespace winrt::UsefulAIKey::implementation
 {
     struct AppPickerView : AppPickerViewT<AppPickerView>
@@ -21,9 +24,9 @@ namespace winrt::UsefulAIKey::implementation
         void Load(hstring const& savedAppPath);
 
         // Event handlers
-        void SearchBox_TextChanged(winrt::Microsoft::UI::Xaml::Controls::AutoSuggestBox const& sender, winrt::Microsoft::UI::Xaml::Controls::AutoSuggestBoxTextChangedEventArgs const& args);
-        void AppsList_ItemClick(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::Controls::ItemClickEventArgs const& e);
-        void BrowseForApp_Click(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::RoutedEventArgs const& e);
+        void SearchBox_TextChanged(Controls::AutoSuggestBox const& sender, winrt::Microsoft::UI::Xaml::Controls::AutoSuggestBoxTextChangedEventArgs const& args);
+        void AppsList_ItemClick(IInspectable const& sender, winrt::Microsoft::UI::Xaml::Controls::ItemClickEventArgs const& e);
+        void BrowseForApp_Click(IInspectable const& sender, RoutedEventArgs const& e);
 
     private:
         DataStorage m_datastorage;

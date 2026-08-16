@@ -5,6 +5,7 @@
 
 using namespace winrt;
 using namespace winrt::Windows::Foundation;
+using namespace winrt::Windows::Foundation::Collections;
 using namespace winrt::Windows::Storage;
 using namespace winrt::Windows::Data::Json;
 using namespace UsefulAIKey;
@@ -103,4 +104,55 @@ IAsyncOperation<SavedSelection> DataStorage::LoadSelectedOptionAsync()
 	}
 
 	co_return result;
+}
+
+IAsyncOperation<SavingError> DataStorage::AddCustomAppAsync(hstring name, hstring path)
+{
+	JsonObject root{ nullptr };
+
+	SavingError loadResult = co_await LoadJsonAsync(root);
+	if (loadResult != SavingError::None)
+		co_return loadResult;
+
+	JsonArray customApps = root.HasKey(L"customApps")
+		? root.GetNamedArray(L"customApps")
+		: JsonArray{};
+
+	// remove duplicates
+	for (auto const& value : customApps)
+	{
+		if (value.GetObject().GetNamedString(L"path", L"") == path)
+			co_return SavingError::None;
+	}
+
+	JsonObject entry;
+	entry.SetNamedValue(L"name", JsonValue::CreateStringValue(name));
+	entry.SetNamedValue(L"path", JsonValue::CreateStringValue(path));
+	customApps.Append(entry);
+
+	root.SetNamedValue(L"customApps", customApps);
+
+	co_return co_await WriteJsonAsync(root);
+}
+
+IAsyncOperation<IVector<CustomApp>> DataStorage::LoadCustomAppsAsync()
+{
+	IVector<CustomApp> apps = single_threaded_vector<CustomApp>();
+
+	JsonObject root{ nullptr };
+	SavingError loadResult = co_await LoadJsonAsync(root);
+	if (loadResult != SavingError::None || !root.HasKey(L"customApps"))
+		co_return apps; // no file / unreadable / nothing saved -> empty list
+
+	for (auto const& value : root.GetNamedArray(L"customApps"))
+	{
+		JsonObject obj = value.GetObject();
+		CustomApp app{};
+		app.Name = obj.GetNamedString(L"name", L"");
+		app.Path = obj.GetNamedString(L"path", L"");
+		if (app.Path.empty()) continue; // skip malformed entries
+		apps.Append(app);
+	}
+
+	co_return apps;
 }

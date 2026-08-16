@@ -6,6 +6,7 @@
 #include "WindowsApps.h"
 #include "WinRTUtil.h"
 
+#include <algorithm>
 #include <filesystem>
 
 #if __has_include("AppPickerView.g.cpp")
@@ -74,6 +75,29 @@ namespace winrt::UsefulAIKey::implementation
             get_self<implementation::AppItem>(item)->LoadIconAsync();
         }
 
+        // add in custom saved apps
+        auto customApps = co_await m_datastorage.LoadCustomAppsAsync();
+        for (auto const& custom : customApps)
+        {
+            bool alreadyListed = false;
+            for (auto const& app : m_allApps)
+            {
+                if (app.Path() == custom.Path) { alreadyListed = true; break; }
+            }
+            if (alreadyListed) continue;
+
+            auto item = make<implementation::AppItem>(custom.Name, custom.Path);
+            m_allApps.push_back(item);
+            get_self<implementation::AppItem>(item)->LoadIconAsync();
+        }
+
+        // resort list after adding custom apps
+        std::sort(m_allApps.begin(), m_allApps.end(),
+            [](UsefulAIKey::AppItem const& a, UsefulAIKey::AppItem const& b)
+            {
+                return a.Name() < b.Name();
+            });
+
         RefreshVisibleApps();
 
         if (!m_savedAppPath.empty())
@@ -84,7 +108,7 @@ namespace winrt::UsefulAIKey::implementation
                 if (app.Path() == m_savedAppPath) { match = app; break; }
             }
 
-            // If an app isn't in the Start Menu, and we added it as custom, we have to add it to m_allApps
+			// uhhhh this shouldn't happen but if somehow the saved app path is no longer in the list, create an entry for it
             if (!match)
             {
                 std::filesystem::path p{ std::wstring{ m_savedAppPath } };
@@ -175,7 +199,9 @@ namespace winrt::UsefulAIKey::implementation
         if (!result) co_return;
 
         std::wstring path{ result.Path() };
-        AppEntry entry = { .name = path, .path = path };
+
+        std::filesystem::path parsed{ path };
+        AppEntry entry = { .name = parsed.stem().wstring(), .path = path };
         AddAppToList(entry);
     }
 
@@ -194,11 +220,16 @@ namespace winrt::UsefulAIKey::implementation
         }
         auto item = make<implementation::AppItem>(hstring{ entry.name }, hstring{ entry.path });
         m_allApps.push_back(item);
-        SelectApp(item);
-        RefreshVisibleApps();
 
-        // Load each icon in the background; the row updates itself when ready.
-        get_self<implementation::AppItem>(item)->LoadIconAsync();
+        HighlightApp(item);
+        get_self<implementation::AppItem>(item)->LoadIconAsync(); // load icon in bg
+
+        // save the custom app to disk
+        UsefulAIKey::SavingError err = co_await m_datastorage.AddCustomAppAsync(item.Name(), item.Path());
+        if (err != UsefulAIKey::SavingError::None)
+            ShowDialogMessage(this->XamlRoot(), L"Error", L"Couldn't save the added app.", L"OK");
+
+        SelectApp(item);
     }
 
     void AppPickerView::HighlightApp(UsefulAIKey::AppItem const& item)
@@ -240,5 +271,4 @@ namespace winrt::UsefulAIKey::implementation
             break;
         }
     }
-
 }

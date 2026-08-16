@@ -23,4 +23,14 @@ namespace UsefulAIKey
         ActionKind Kind;  // app / website / file
         String Command;   // the app path, url, or file path ("" when nothing is saved)
     };
+
+    // One user-added app in the persisted custom-apps list. A WinRT struct (holds
+    // only strings) so it can be the T in IAsyncOperation<IVector<CustomApp>>.
+    // These are the apps the user picked via "Browse for app..."; they persist
+    // across launches and get merged back into the picker on load.
+    struct CustomApp
+    {
+        String Name;  // display name shown in the list
+        String Path;  // full path to the target executable
+    };
 }

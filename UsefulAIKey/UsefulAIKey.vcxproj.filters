@@ -6,6 +6,8 @@
   <ItemGroup>
     <Page Include="MainWindow.xaml" />
     <Page Include="AppPickerView.xaml" />
+    <Page Include="FileOpenView.xaml" />
+    <Page Include="WebsiteLaunchView.xaml" />
   </ItemGroup>
   <ItemGroup>
     <Midl Include="MainWindow.idl" />
@@ -20,6 +22,7 @@
     <ClCompile Include="AppItem.cpp" />
     <ClCompile Include="WindowsApps.cpp" />
     <ClCompile Include="DataStorage.cpp" />
+    <ClCompile Include="WinRTUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -28,6 +31,7 @@
     <ClInclude Include="WindowsApps.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="DataStorage.h" />
+    <ClInclude Include="WinRTUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Wide310x150Logo.scale-200.png">
