@@ -6,7 +6,7 @@
 using namespace winrt;
 using namespace Microsoft::UI::Xaml;
 
-winrt::fire_and_forget ShowDialogMessage(XamlRoot xamlRoot, hstring title, hstring content,
+winrt::fire_and_forget ShowMessageDialog(XamlRoot xamlRoot, hstring title, hstring content,
     hstring primaryButtonText, hstring secondaryButtonText, hstring closeButtonText)
 {
     using namespace winrt::Microsoft::UI::Xaml::Controls;

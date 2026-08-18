@@ -27,6 +27,8 @@ namespace winrt::UsefulAIKey::implementation
         void SearchBox_TextChanged(Controls::AutoSuggestBox const& sender, winrt::Microsoft::UI::Xaml::Controls::AutoSuggestBoxTextChangedEventArgs const& args);
         void AppsList_ItemClick(IInspectable const& sender, winrt::Microsoft::UI::Xaml::Controls::ItemClickEventArgs const& e);
         void BrowseForApp_Click(IInspectable const& sender, RoutedEventArgs const& e);
+        void Rename_AppListClick(IInspectable const& sender, RoutedEventArgs const& e);
+
 
     private:
         DataStorage m_datastorage;
@@ -52,11 +54,12 @@ namespace winrt::UsefulAIKey::implementation
         // reference here would dangle after the first suspension and crash.
         winrt::fire_and_forget OpenFilePicker(winrt::Microsoft::UI::WindowId windowId);
 
-        winrt::fire_and_forget AddAppToList(AppEntry entry);
+        winrt::fire_and_forget AddAppToList(AppEntry entry, bool replaceDuplicate);
         winrt::fire_and_forget SelectApp(UsefulAIKey::AppItem item);
 
-        // Pure-UI selection (no persistence); reused by startup restore.
-        void HighlightApp(UsefulAIKey::AppItem const& item);
+        fire_and_forget RenameAppListDialog(std::wstring_view path);
+        
+        void HighlightApp(UsefulAIKey::AppItem const& item); // ui only
         
         // Rebuilds m_visibleApps from m_allApps using the current search text,
         // placing the pinned app first.

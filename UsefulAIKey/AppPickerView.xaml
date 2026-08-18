@@ -50,6 +50,13 @@
                                 Visibility="{x:Bind SelectionIndicatorVisibility, Mode=OneWay}"/>
 
                         <Grid ColumnSpacing="12" Padding="14,6,10,6">
+                            <Grid.ContextFlyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Text="Rename" Click="Rename_AppListClick" />
+                                    <MenuFlyoutItem Text="Delete" Click="Delete_AppListClick" />
+                                </MenuFlyout>
+                            </Grid.ContextFlyout>
+                            
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>

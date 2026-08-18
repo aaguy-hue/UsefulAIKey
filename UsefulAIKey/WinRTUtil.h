@@ -1,7 +1,7 @@
 #pragma once
 
 
-winrt::fire_and_forget ShowDialogMessage(
+winrt::fire_and_forget ShowMessageDialog(
 	winrt::Microsoft::UI::Xaml::XamlRoot xamlRoot,
 	winrt::hstring title, winrt::hstring content,
 	winrt::hstring primaryButtonText = L"OK", winrt::hstring secondaryButtonText = L"",

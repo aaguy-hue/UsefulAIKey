@@ -181,6 +181,37 @@ namespace winrt::UsefulAIKey::implementation
         OpenFilePicker(this->XamlRoot().ContentIslandEnvironment().AppWindowId());
     }
 
+    winrt::fire_and_forget AppPickerView::AddAppToList(AppEntry entry, bool replaceDuplicate = false)
+    {
+        auto lifetime = get_strong();
+        // check for duplicates first
+        //for (auto& app : m_allApps)
+        for (size_t i = m_allApps.size() - 1; i >= 0; i--)
+        {
+            auto app = m_allApps.at(i);
+            if (app.Path() == entry.path)
+            {
+                if (replaceDuplicate) { m_allApps.erase(m_allApps.begin() + i); break; }
+
+                ShowMessageDialog(this->XamlRoot(), L"Warning", L"This app is already in the list", L"OK");
+                SelectApp(app);
+                co_return;
+            }
+        }
+        auto item = make<implementation::AppItem>(hstring{ entry.name }, hstring{ entry.path });
+        m_allApps.push_back(item);
+
+        HighlightApp(item);
+        get_self<implementation::AppItem>(item)->LoadIconAsync(); // load icon in bg
+
+        // save the custom app to disk
+        UsefulAIKey::SavingError err = co_await m_datastorage.AddCustomAppAsync(item.Name(), item.Path());
+        if (err != UsefulAIKey::SavingError::None)
+            ShowMessageDialog(this->XamlRoot(), L"Error", L"Couldn't save the added app.", L"OK");
+
+        SelectApp(item);
+    }
+
     winrt::fire_and_forget AppPickerView::OpenFilePicker(winrt::Microsoft::UI::WindowId windowId)
     {
         // Keep 'this' alive across the awaits below (the file picker and the naming
@@ -213,39 +244,13 @@ namespace winrt::UsefulAIKey::implementation
             L"App name",
             hstring{ parsed.stem().wstring() },
             L"Add",
-            L"Cancel");
+            L"Cancel"
+        );
 
         if (name.empty()) co_return;
 
         AppEntry entry = { .name = std::wstring{ name }, .path = path };
         AddAppToList(entry);
-    }
-
-    winrt::fire_and_forget AppPickerView::AddAppToList(AppEntry entry)
-    {
-        auto lifetime = get_strong();
-        // check for duplicates first
-        for (auto& app : m_allApps)
-        {
-            if (app.Path() == entry.path)
-            {
-				ShowDialogMessage(this->XamlRoot(), L"Warning", L"This app is already in the list", L"OK");
-                SelectApp(app);
-                co_return;
-            }
-        }
-        auto item = make<implementation::AppItem>(hstring{ entry.name }, hstring{ entry.path });
-        m_allApps.push_back(item);
-
-        HighlightApp(item);
-        get_self<implementation::AppItem>(item)->LoadIconAsync(); // load icon in bg
-
-        // save the custom app to disk
-        UsefulAIKey::SavingError err = co_await m_datastorage.AddCustomAppAsync(item.Name(), item.Path());
-        if (err != UsefulAIKey::SavingError::None)
-            ShowDialogMessage(this->XamlRoot(), L"Error", L"Couldn't save the added app.", L"OK");
-
-        SelectApp(item);
     }
 
     void AppPickerView::HighlightApp(UsefulAIKey::AppItem const& item)
@@ -274,17 +279,44 @@ namespace winrt::UsefulAIKey::implementation
         case UsefulAIKey::SavingError::None:
             break;
         case UsefulAIKey::SavingError::ReadError:
-            ShowDialogMessage(this->XamlRoot(), L"Error", L"Couldn't read the saved settings file.", L"OK");
+            ShowMessageDialog(this->XamlRoot(), L"Error", L"Couldn't read the saved settings file.", L"OK");
             break;
         case UsefulAIKey::SavingError::ParseError:
-            ShowDialogMessage(this->XamlRoot(), L"Error", L"The saved settings file is corrupted.", L"OK");
+            ShowMessageDialog(this->XamlRoot(), L"Error", L"The saved settings file is corrupted.", L"OK");
             break;
         case UsefulAIKey::SavingError::CapacityExceeded:
-            ShowDialogMessage(this->XamlRoot(), L"Error", L"Settings data exceeds the maximum capacity.", L"OK");
+            ShowMessageDialog(this->XamlRoot(), L"Error", L"Settings data exceeds the maximum capacity.", L"OK");
             break;
         case UsefulAIKey::SavingError::WriteError:
-            ShowDialogMessage(this->XamlRoot(), L"Error", L"Couldn't save the settings file.", L"OK");
+            ShowMessageDialog(this->XamlRoot(), L"Error", L"Couldn't save the settings file.", L"OK");
             break;
         }
     }
+    
+    void AppPickerView::Rename_AppListClick(IInspectable const& sender, RoutedEventArgs const& e)
+    {
+        auto item = sender.as<FrameworkElement>().DataContext();
+        auto app = item.as<AppItem>();
+        RenameAppListDialog(app.get()->Path());
+    }
+
+    fire_and_forget AppPickerView::RenameAppListDialog(std::wstring_view path)
+    {
+        std::filesystem::path parsed{ path };
+        hstring name = co_await ShowInputDialog(
+            this->XamlRoot(),
+            L"Rename this app",
+            L"App name",
+            hstring{ parsed.stem().wstring() },
+            L"Add",
+            L"Cancel"
+        );
+
+        if (name.empty()) co_return;
+
+        AppEntry entry = { .name = std::wstring{ name }, .path = std::wstring {path} };
+        AddAppToList(entry, true);
+    }
 }
+
+
