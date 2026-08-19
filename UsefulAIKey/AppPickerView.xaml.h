@@ -28,6 +28,7 @@ namespace winrt::UsefulAIKey::implementation
         void AppsList_ItemClick(IInspectable const& sender, winrt::Microsoft::UI::Xaml::Controls::ItemClickEventArgs const& e);
         void BrowseForApp_Click(IInspectable const& sender, RoutedEventArgs const& e);
         void Rename_AppListClick(IInspectable const& sender, RoutedEventArgs const& e);
+        void Delete_AppListClick(IInspectable const& sender, RoutedEventArgs const& e);
 
 
     private:
@@ -57,7 +58,7 @@ namespace winrt::UsefulAIKey::implementation
         winrt::fire_and_forget AddAppToList(AppEntry entry, bool replaceDuplicate);
         winrt::fire_and_forget SelectApp(UsefulAIKey::AppItem item);
 
-        fire_and_forget RenameAppListDialog(std::wstring_view path);
+        fire_and_forget RenameAppListDialog(hstring name_old, std::wstring_view path);
         
         void HighlightApp(UsefulAIKey::AppItem const& item); // ui only
         

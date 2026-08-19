@@ -186,7 +186,7 @@ namespace winrt::UsefulAIKey::implementation
         auto lifetime = get_strong();
         // check for duplicates first
         //for (auto& app : m_allApps)
-        for (size_t i = m_allApps.size() - 1; i >= 0; i--)
+        for (size_t i = m_allApps.size() - 1; i-- > 0 ; )
         {
             auto app = m_allApps.at(i);
             if (app.Path() == entry.path)
@@ -296,19 +296,25 @@ namespace winrt::UsefulAIKey::implementation
     void AppPickerView::Rename_AppListClick(IInspectable const& sender, RoutedEventArgs const& e)
     {
         auto item = sender.as<FrameworkElement>().DataContext();
-        auto app = item.as<AppItem>();
-        RenameAppListDialog(app.get()->Path());
+        auto app = item.as<AppItem>().get();
+        RenameAppListDialog(app->Name(), app->Path());
     }
 
-    fire_and_forget AppPickerView::RenameAppListDialog(std::wstring_view path)
+    void AppPickerView::Delete_AppListClick(IInspectable const& sender, RoutedEventArgs const& e)
     {
+
+    }
+
+    fire_and_forget AppPickerView::RenameAppListDialog(hstring name_old, std::wstring_view path)
+    {
+		OutputDebugStringW((L"Renaming app: " + std::wstring(path) + L"\n").c_str());
         std::filesystem::path parsed{ path };
         hstring name = co_await ShowInputDialog(
             this->XamlRoot(),
             L"Rename this app",
             L"App name",
-            hstring{ parsed.stem().wstring() },
-            L"Add",
+            name_old,
+            L"Rename",
             L"Cancel"
         );
 
